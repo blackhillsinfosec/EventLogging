@@ -1,0 +1,114 @@
+winlogbeat.event_logs:
+  ######## Collect From Local Server/Device Itself ######## 
+  - name: Application
+    ignore_older: 72h
+    include_xml: true
+  - name: System
+    include_xml: true
+  - name: Security
+    include_xml: true
+    processors:
+      - script:
+          lang: javascript
+          id: security
+          file: ${path.home}/module/security/config/winlogbeat-security.js
+  - name: Microsoft-Windows-Sysmon/Operational
+    include_xml: true
+    processors:
+      - script:
+          lang: javascript
+          id: sysmon
+          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+  - name: Windows PowerShell
+    #event_id: 400, 403, 600, 800
+    include_xml: true
+    processors:
+      - script:
+          lang: javascript
+          id: powershell
+          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
+  - name: Microsoft-Windows-PowerShell/Operational
+    #event_id: 4103, 4104, 4105, 4106
+    include_xml: true
+    processors:
+      - script:
+          lang: javascript
+          id: powershell
+          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js    
+  - name: Microsoft-Windows-WMI-Activity/Operational
+    event_id: 5857,5858,5859,5860,5861
+    include_xml: true
+  ######## END Collect From Local Server/Device Itself ########
+  ######## Collect From Forwarded Events ########
+  - name: ForwardedEvents
+    include_xml: true
+    processors:
+      - script:
+          when.equals.winlog.channel: Security
+          lang: javascript
+          id: security
+          file: ${path.home}/module/security/config/winlogbeat-security.js
+      - script:
+          when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
+          lang: javascript
+          id: sysmon
+          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+      - script:
+          when.equals.winlog.channel: Windows PowerShell
+          lang: javascript
+          id: powershell
+          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
+      - script:
+          when.equals.winlog.channel: Microsoft-Windows-PowerShell/Operational
+          lang: javascript
+          id: powershell
+          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
+  ######## END Collect From Forwarded Events ########
+
+
+#================================ Processors =====================================
+
+processors:
+  - community_id:
+  - registered_domain:
+      field: dns.question.name
+      target_field: dns.question.registered_domain
+      target_etld_field: dns.question.top_level_domain
+      target_subdomain_field: dns.question.sudomain
+      ignore_missing: true
+      ignore_failure: true
+  - registered_domain:
+      field: url.domain
+      target_field: url.registered_domain
+      target_etld_field: url.top_level_domain
+      target_subdomain_field: url.sudomain
+      ignore_missing: true
+      ignore_failure: true
+  - registered_domain:
+      field: destination.domain
+      target_field: destination.registered_domain
+      target_etld_field: destination.top_level_domain
+      target_subdomain_field: destination.sudomain
+      ignore_missing: true
+      ignore_failure: true
+  - add_tags:
+      tags: [ "version: <vTAG>", "<wlbTAG>" ]
+  - add_fields:
+      target: ''
+      fields:
+        company: <CompanyInit>
+#-------------------- Logstash output -------------------
+output.logstash:
+  # The Logstash hosts
+  hosts: ["<Logstash>:5044"]
+
+# ================================== Logging ===================================
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: 'C:\Program Files\winlogbeat\logs\'
+  name: winlogbeat
+  keepfiles: 7
+  logging.files.rotateeverybytes: 10485760 # 10MB # Default
+  permissions: 0600
+#logging.to_eventlog: false
