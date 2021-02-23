@@ -47,7 +47,7 @@ wevtutil sl ForwardedEvents /ms:41943040
 
 # Fix WecSvc and WinRM ACLs
 netsh http delete urlacl url=http://+:5985/wsman/
-netsh http add urlacl url=http://+:5985/wsman/ sddl=D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)
+netsh http add urlacl url=http://+:5985/wsman/ "sddl=D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)"
 
 # Destroy staging directory
 cd $Env:WinDir
