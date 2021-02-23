@@ -16,6 +16,7 @@ cd \tmp-eventlogging\
 Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.10.1-windows-x86_64.zip -OutFile "WinLogBeat.zip"
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
 Invoke-WebRequest -URI "<WinLogBeatConf>" -OutFile "WEC.zip"
+Invoke-WebRequest -URI "<certurl>" -OutFile "ca.crt"
 
 
 # Expand Tools
@@ -26,6 +27,7 @@ Expand-Archive .\WEC.zip
 
 
 # Install WinLogBeat as service
+cp \tmp-eventlogging\ca.crt '\program files\winlogbeat\ca.crt'
 cd '\Program Files\WinLogBeat\'
 powershell -Exec bypass -File .\install-service-winlogbeat.ps1 > $null
 Set-Service -name "winlogbeat" -StartupType automatic
@@ -46,7 +48,6 @@ wevtutil sl ForwardedEvents /ms:41943040
 # Fix WecSvc and WinRM ACLs
 netsh http delete urlacl url=http://+:5985/wsman/
 netsh http add urlacl url=http://+:5985/wsman/ sddl=D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)
-
 
 # Destroy staging directory
 cd $Env:WinDir
