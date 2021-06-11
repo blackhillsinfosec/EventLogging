@@ -22,9 +22,9 @@ Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive
 
 
 # Import and Create GPOs
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-WS-Enhanced-Auditing\" -BackupGpoName "SOC-WS-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-WS-Enhanced-Auditing"
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-CMD-PS-Logging\" -BackupGpoName "SOC-CMD-PS-Logging" -CreateIfNeeded -TargetName "SOC-CMD-PS-Logging"
-
+Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-WS-Enhanced-Auditing\" -BackupGpoName "SOC-WS-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-WS-Enhanced-Auditing" > $null
+Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-CMD-PS-Logging\" -BackupGpoName "SOC-CMD-PS-Logging" -CreateIfNeeded -TargetName "SOC-CMD-PS-Logging" > $null
+Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-Enable-WinRM\" -BackupGpoName "SOC-Enable-WinRM" -CreateIfNeeded -TargetName "SOC-Enable-WinRM" > $null
 
 # Destroy staging directory
 cd $Env:WinDir
@@ -32,6 +32,6 @@ rm \tmp-eventlogging\ -R -Force
 
 
 # write-host("New GPO SOC-Sysmon Deployment requires additional configuration and linking")
-write-host("Group policies have been imported for SOC-WS-Enhanced-Auditing and SOC-CMD-PS-Logging. These policies need to be linked before their settings are applied.")
+write-host("Group policies have been imported for SOC-WS-Enhanced-Auditing, SOC-CMD-PS-Logging, and SOC-Enable-WinRM. These policies need to be linked before their settings are applied.")
 # Return to directory of this script
 cd $startdir
