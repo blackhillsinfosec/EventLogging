@@ -22,7 +22,7 @@ Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive
 
 
 # Import and Create GPOs
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON2\Group-Policy-Objects\SOC-Enable-WinRM\" -BackupGpoName "SOC-Enable-WinRM" -CreateIfNeeded -TargetName "SOC-Enable-WinRM" > $null
+Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON2\Group-Policy-Objects\SOC-CMD-PS-Logging\" -BackupGpoName "SOC-CMD-PS-Logging" -CreateIfNeeded -TargetName "SOC-CMD-PS-Logging" > $null
 
 
 # Destroy staging directory
