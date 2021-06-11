@@ -31,6 +31,6 @@ rm \tmp-eventlogging\ -R -Force
 
 
 # write-host("New GPO SOC-Sysmon Deployment requires additional configuration and linking")
-write-host("Group policies have been imported for SOC-WS-Enhanced-Auditing, SOC-CMD-PS-Logging, and SOC-Enable-WinRM. These policies need to be linked before their settings are applied.")
+write-host("Group policies have been imported for SOC-WS-Enhanced-Auditing and SOC-Enable-WinRM. These policies need to be linked before their settings are applied.")
 # Return to directory of this script
 cd $startdir
