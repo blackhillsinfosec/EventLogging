@@ -13,7 +13,7 @@ cd \tmp-eventlogging\
 
 # Download Tools
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.10.1-windows-x86_64.zip -OutFile "WinLogBeat.zip"
+Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.13.2-windows-x86_64.zip -OutFile "WinLogBeat.zip"
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
 Invoke-WebRequest -URI "<WinLogBeatConf>" -OutFile "WEC.zip"
 Invoke-WebRequest -URI "<certurl>" -OutFile "ca.crt"
@@ -21,7 +21,7 @@ Invoke-WebRequest -URI "<certurl>" -OutFile "ca.crt"
 
 # Expand Tools
 Expand-Archive .\WinLogBeat.zip '\Program Files\'
-Rename-Item '\Program Files\winlogbeat-7.10.1-windows-x86_64' WinLogBeat
+Rename-Item '\Program Files\winlogbeat-7.13.2-windows-x86_64' WinLogBeat
 Expand-Archive .\EventLogging.zip
 Expand-Archive .\WEC.zip
 
