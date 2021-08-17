@@ -25,6 +25,10 @@
           <Image condition="is not">c:\windows\system32\mmc.exe</Image>
         </Rule>
         <ParentImage name="technique_id=T1548.002,technique_name=Bypass User Access Control" condition="image">fodhelper.exe</ParentImage>
+        <Rule name="technique_id=T1548.002,technique_name=UAC Bypass via Windows Firewall Snap-In Hijack" groupRelation="and">
+          <ParentImage condition="image">mmc.exe</ParentImage>
+          <ParentCommandLine condition="contains">WF.msc</ParentCommandLine>
+        </Rule>
         <Rule groupRelation="and">
           <CommandLine condition="contains">Set-MpPreference</CommandLine>
           <CommandLine condition="contains any">-DisableRealTimeMonitoring $true;-DisableBehaviorMonitoring $true;-DisableBlockAtFirstSeen $true;-DisableIOAVProtection $true;-DisablePrivacyMode $true;-SignatureDisableUpdateOnStartupWithoutEngine $true;-DisableArchiveScanning $true;-DisableIntrusionPreventionSystem $true;-DisableScriptScanning $true</CommandLine>
@@ -753,6 +757,7 @@
         <DestinationPort name="technique_id=T1021,technique_name=Remote Services" condition="is">3389</DestinationPort>
         <DestinationPort name="technique_id=T1021,technique_name=Remote Services" condition="is">5800</DestinationPort>
         <DestinationPort name="technique_id=T1021,technique_name=Remote Services" condition="is">5900</DestinationPort>
+        <DestinationPort name="technique_id=T1021,technique_name=Remote Services" condition="is">1812</DestinationPort>
         <Image name="technique_id=T1569.002,technique_name=Service Execution" condition="image">psexec.exe</Image>
         <Image name="technique_id=T1569.002,technique_name=Service Execution" condition="image">psexec64.exe</Image>
         <Image name="technique_id=T1569.002,technique_name=Service Execution" condition="image">psexesvc.exe</Image>
@@ -865,6 +870,8 @@
           <ImageLoaded condition="contains any">System.ni.dll;System.Core.ni.dll</ImageLoaded>
         </Rule>
         <ImageLoaded name="technique_id=T1197,technique_name=BITS" condition="end with">bitsproxy.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1003,technique_name=Credential Dumping" condition="end with">vaultcli.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1003,technique_name=Credential Dumping" condition="end with">samlib.dll</ImageLoaded>
         <Rule groupRelation="and">
           <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">clr.dll</OriginalFileName>
           <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
@@ -897,14 +904,6 @@
         <ImageLoaded name="technique_id=T1064,technique_name=Windows Scripting Host Component" condition="end with">wshom.ocx</ImageLoaded>
         <OriginalFileName condition="is">scrrun.dll</OriginalFileName>
         <OriginalFileName condition="is">vbscript.dll</OriginalFileName>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1170,technique_name=MSHTA with AMSI Bypass" condition="is">jscript.dll</OriginalFileName>
-          <Image condition="end with">mshta.exe</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1170,technique_name=MSHTA with AMSI Bypass" condition="is">jscript9.dll</OriginalFileName>
-          <Image condition="end with">mshta.exe</Image>
-        </Rule>
         <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.wll</ImageLoaded>
         <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.xll</ImageLoaded>
         <Rule groupRelation="and">
@@ -966,9 +965,44 @@
           <OriginalFileName name="technique_id=T1003.004,technique_name=LSASS Memory" condition="is">comsvcs.dll</OriginalFileName>
         </Rule>
         <OriginalFileName name="technique_id=T1053,technique_name=Scheduled Task" condition="is">taskschd.dll</OriginalFileName>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1170,technique_name=MSHTA with AMSI Bypass" condition="is">jscript.dll</OriginalFileName>
+          <Image condition="end with">mshta.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1170,technique_name=MSHTA with AMSI Bypass" condition="is">jscript9.dll</OriginalFileName>
+          <Image condition="end with">mshta.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1220,technique_name=XSL Script Processing" condition="is">jscript.dll</OriginalFileName>
+          <Image condition="end with">wmic.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1220,technique_name=XSL Script Processing" condition="is">jscript9.dll</OriginalFileName>
+          <Image condition="end with">wmic.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1220,technique_name=XSL Script Processing" condition="is">vbscript.dll</OriginalFileName>
+          <Image condition="end with">wmic.exe</Image>
+        </Rule>
         <ImageLoaded name="technique_id=T1218.010,technique_name=Regsvr32" condition="end with">scrobj.dll</ImageLoaded>
         <OriginalFileName name="technique_id=T1218.010,technique_name=Regsvr32" condition="is">scrobj.dll</OriginalFileName>
         <ImageLoaded name="technique_id=T1073,technique_name=DLL Side-Loading" condition="contains any">admin$;c$;\\;\appdata\;\temp\</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">wlbsctrl.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">wbemcomn.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">WptsExtensions.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">Tsmsisrv.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">TSVIPSrv.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">Msfte.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">wow64log.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">WindowsCoreDeviceInfo.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">Ualapi.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">wlanhlp.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">phoneinfo.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">EdgeGdi.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">cdpsgshims.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">windowsperformancerecordercontrol.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">diagtrack_win.dll</ImageLoaded>
         <ImageLoaded condition="begin with" name="technique_id=T1073,technique_name=DLL Side-Loading">c:\programdata\</ImageLoaded>
         <ImageLoaded condition="begin with" name="technique_id=T1073,technique_name=DLL Side-Loading">C:\Windows\Media\</ImageLoaded>
         <ImageLoaded condition="begin with" name="technique_id=T1073,technique_name=DLL Side-Loading">C:\Windows\addins\</ImageLoaded>
@@ -1504,9 +1538,12 @@
         <TargetObject condition="contains">\Classes\Drive</TargetObject>
         <TargetObject condition="contains">\Classes\Folder</TargetObject>
         <TargetObject condition="contains">\ContextMenuHandlers</TargetObject>
-        <TargetObject condition="contains">\CurrentVersion\Shell</TargetObject>
         <TargetObject condition="begin with">HKLM\Software\Microsoft\Windows\CurrentVersion\explorer\ShellExecuteHooks</TargetObject>
         <TargetObject condition="begin with">HKLM\Software\Microsoft\Windows\CurrentVersion\explorer\ShellServiceObjectDelayLoad</TargetObject>
+        <TargetObject name="technique_id=T1547.001,technique_name=Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder" condition="contains">HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders\Common Startup</TargetObject>
+        <TargetObject name="technique_id=T1547.001,technique_name=Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder" condition="contains">HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Startup</TargetObject>
+        <TargetObject name="technique_id=T1547.001,technique_name=Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder" condition="end with">Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders\Startup</TargetObject>
+        <TargetObject name="technique_id=T1547.001,technique_name=Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder" condition="end with">Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Startup</TargetObject>
         <TargetObject name="technique_id=T1548.002,technique_name=Bypass User Access Control" condition="begin with">HKCU\Software\Classes\AppX82a6gwre4fdg3bt635tn5ctqjf8msdd2\Shell\open\command</TargetObject>
         <TargetObject condition="contains">{AB8902B4-09CA-4bb6-B78D-A8F59079A8D5}</TargetObject>
         <TargetObject name="technique_id=T1548.002,technique_name=Bypass User Access Control" condition="begin with">HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA</TargetObject>
