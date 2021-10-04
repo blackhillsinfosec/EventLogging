@@ -29,6 +29,10 @@
           <ParentImage condition="image">mmc.exe</ParentImage>
           <ParentCommandLine condition="contains">WF.msc</ParentCommandLine>
         </Rule>
+        <Rule name="UAC Bypass Attempt with IEditionUpgradeManager Elevated COM Interface" groupRelation="and">
+          <ParentImage condition="image">dllhost.exe</ParentImage>
+          <Image condition="image">clipup.exe</Image>
+        </Rule>
         <Rule groupRelation="and">
           <CommandLine condition="contains">Set-MpPreference</CommandLine>
           <CommandLine condition="contains any">-DisableRealTimeMonitoring $true;-DisableBehaviorMonitoring $true;-DisableBlockAtFirstSeen $true;-DisableIOAVProtection $true;-DisablePrivacyMode $true;-SignatureDisableUpdateOnStartupWithoutEngine $true;-DisableArchiveScanning $true;-DisableIntrusionPreventionSystem $true;-DisableScriptScanning $true</CommandLine>
@@ -85,6 +89,7 @@
         <ParentImage name="technique_id=T1059,technique_name=Command-Line Interface" condition="image">cmd.exe</ParentImage>
         <Image name="technique_id=T1086,technique_name=PowerShell" condition="image">powershell.exe</Image>
         <ParentImage name="technique_id=T1086,technique_name=PowerShell" condition="image">powershell.exe</ParentImage>
+        <OriginalFileName name="technique_id=T1547,technique_name=Execution of Persistent Suspicious Programs" condition="is">powershell.exe</OriginalFileName>
         <ParentImage name="technique_id=T1086,technique_name=PowerShell" condition="image">powershell_ise.exe</ParentImage>
         <OriginalFileName name="technique_id=T1202,technique_name=Indirect Command Execution" condition="is">bash.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1073,technique_name=DLL Side-Loading" condition="is">odbcconf.exe</OriginalFileName>
@@ -315,6 +320,7 @@
         <OriginalFileName name="technique_id=T1007,technique_name=System Service Discovery" condition="is">PsService.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1569.002,technique_name=Service Execution" condition="is">PsExec.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1569.002,technique_name=Service Execution" condition="is">PsExec.c</OriginalFileName>
+        <OriginalFileName name="technique_id=T1569.002,technique_name=Service Execution" condition="is">PsExesvc.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1033,technique_name=System Owner/User Discovery" condition="is">PsGetSID.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1089,technique_name=Disabling Security Tools" condition="is">PsKill.exe</OriginalFileName>
         <OriginalFileName name="technique_id=T1089,technique_name=Disabling Security Tools" condition="is">PKill.exe</OriginalFileName>
@@ -794,6 +800,12 @@
         <DestinationPort name="technique_id=T1043,technique_name=Commonly Used Port" condition="is">9030</DestinationPort>
         <DestinationPort name="technique_id=T1021.006,technique_name=Windows Remote Management" condition="is">5985</DestinationPort>
         <DestinationPort name="technique_id=T1021.006,technique_name=Windows Remote Management" condition="is">5986</DestinationPort>
+        <Rule name="" groupRelation="and">
+          <Image name="technique_id=T1021.003,technique_name=Remote Services" condition="image">explorer.exe</Image>
+          <DestinationPort condition="is not">137</DestinationPort>
+          <DestinationPort condition="is not">443</DestinationPort>
+          <DestinationPort condition="is not">445</DestinationPort>
+        </Rule>
       </NetworkConnect>
     </RuleGroup>
     <!-- Event ID 3 == Network Connection - Excludes -->
@@ -960,6 +972,7 @@
         <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Security.dll</ImageLoaded>
         <ImageLoaded name="technique_id=1210,technique_name=Exploitation of Remote Services" condition="begin with">C:\Windows\System32\spool\drivers\</ImageLoaded>
         <OriginalFileName name="technique_id=T1112,technique_name=Modify Registry" condition="is">regsvc.dll</OriginalFileName>
+        <ImageLoaded name="technique_id=T1021,technique_name=Remote Services" condition="end with">mstscax.dll</ImageLoaded>
         <Rule groupRelation="and">
           <Image condition="end with">rundll32.exe</Image>
           <OriginalFileName name="technique_id=T1003.004,technique_name=LSASS Memory" condition="is">comsvcs.dll</OriginalFileName>
@@ -1393,6 +1406,7 @@
         <TargetObject name="technique_id=T1546.010,technique_name=Appinit DLLs" condition="begin with">HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Windows\Appinit_Dlls</TargetObject>
         <TargetObject name="technique_id=T1546.010,technique_name=Appinit DLLs" condition="is">REGISTRY\MACHINE\SYSTEM\ControlSet001\Services\DNS\Parameters\ServerLevelPluginDll</TargetObject>
         <TargetObject name="technique_id=T1562.006,technique_name=Impair Defenses - Indicator Blocking" condition="end with">SOFTWARE\Microsoft\.NETFramework\ETWEnabled</TargetObject>
+        <Details name="technique_id=T1140,technique_name=Deobfuscate/Decode Files or Information" condition="contains">TVqQAAMAAAAEAAAA</Details>
         <TargetObject name="technique_id=T1015,technique_name=Accessibility Features" condition="contains">HKCU\Environment</TargetObject>
         <TargetObject name="technique_id=T1112,technique_name=Modification of Environmental Varibles" condition="contains">Environment\systemroot</TargetObject>
         <TargetObject name="technique_id=T1112,technique_name=Modification of Environmental Varibles" condition="contains">Environment\windir</TargetObject>
