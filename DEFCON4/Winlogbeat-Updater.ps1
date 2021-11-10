@@ -13,15 +13,17 @@ cd \tmp-eventlogging\
 
 # Download Tools
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.13.2-windows-x86_64.zip -OutFile "WinLogBeat.zip"
+Invoke-WebRequest -URI "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.15.1-windows-x86_64.zip" -OutFile "WinLogBeat.zip"
 
+
+if (test-path '\Program Files\Winlogbeat-old'){remove-item '\Program Files\Winlogbeat-old' -recurse}
 
 Stop-Service Winlogbeat
 Move-item '\Program Files\Winlogbeat\' '\Program Files\Winlogbeat-old'
 
 
 Expand-Archive .\WinLogBeat.zip '\Program Files\'
-Rename-Item '\Program Files\winlogbeat-7.13.2-windows-x86_64' WinLogBeat
+Rename-Item '\Program Files\winlogbeat-7.15.1-windows-x86_64' WinLogBeat
 
 
 cd '\Program Files\WinLogBeat\'
