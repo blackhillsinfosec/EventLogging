@@ -10,20 +10,21 @@ cd $Env:WinDir
 mkdir \tmp-eventlogging\ > $null
 cd \tmp-eventlogging\
 
+#Copy traveling files
+cp $startdir\winlogbeat.yml \tmp-eventlogging\winlogbeat.yml
+### Dont need this cert for prod however people on Github may.
+cp $startdir\ca.crt \tmp-eventlogging\ca.crt
 
 # Download Tools
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.13.2-windows-x86_64.zip -OutFile "WinLogBeat.zip"
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
-Invoke-WebRequest -URI "<WinLogBeatConf>" -OutFile "WEC.zip"
-Invoke-WebRequest -URI "<certurl>" -OutFile "ca.crt"
 
 
 # Expand Tools
 Expand-Archive .\WinLogBeat.zip '\Program Files\'
 Rename-Item '\Program Files\winlogbeat-7.13.2-windows-x86_64' WinLogBeat
 Expand-Archive .\EventLogging.zip
-Expand-Archive .\WEC.zip
 
 
 # Install WinLogBeat as service
@@ -33,7 +34,7 @@ powershell -Exec bypass -File .\install-service-winlogbeat.ps1 > $null
 Set-Service -name "winlogbeat" -StartupType automatic
 cp '\program files\WinLogBeat\winlogbeat.yml' '\program files\winlogbeat\winlogbeat.yml.old'
 $null > '\program files\winlogbeat\winlogbeat.yml'
-Get-Content \tmp-eventlogging\WEC\WEC\winlogbeat.yml > '\program files\winlogbeat\winlogbeat.yml'
+Get-Content \tmp-eventlogging\winlogbeat.yml > '\program files\winlogbeat\winlogbeat.yml'
 Start-Service -name "winlogbeat"
 Get-Service -name "winlogbeat"
 
