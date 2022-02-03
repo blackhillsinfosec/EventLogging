@@ -3,8 +3,8 @@ $wechost = "<WECSERVER>"
 
 
 # Get working directory of this script to return to
-$startdir = ($pwd).path
-
+$invocation = $MyInvocation.MyCommand.Path
+$startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
  	
 # Change to WinDir directory, script will perform work using this drive (Usually C:\)
 cd $Env:WinDir
