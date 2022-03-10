@@ -142,4 +142,16 @@ catch{
 
 }
 
+function Sysmon_Archive_Cleanup
+{
+#Manages the archive used to store files seen in EID 23 logs. This will keep the last 30 days worth of files should they be needed for forensics.
+$Path = "C:\Sysmon"
+$Days = "-30"
+ 
+$CurrentDate = Get-Date
+$DatetoDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $Path | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item
+}
+
 main
+Sysmon_Archive_Cleanup
