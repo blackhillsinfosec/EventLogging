@@ -1,54 +1,70 @@
-# Set Windows Event Collector FQDN
-$wechost = "<WECSERVER>"
+function invoke-main {
+    #Collect path to site dictionary file from user.
+    Write-host "An Exploer window will open shortly please select the site definition csv file"
+    Start-sleep -seconds 3
+    $WECSites = Import-csv $(Get-CSVFilePath)
+
+    # Get working directory of this script to return to
+    $invocation = $MyInvocation.MyCommand.Path
+    $startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+        
+    # Change to WinDir directory, script will perform work using this drive (Usually C:\)
+    cd $Env:WinDir
 
 
-# Get working directory of this script to return to
-$invocation = $MyInvocation.MyCommand.Path
-$startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
-
- 	
-# Change to WinDir directory, script will perform work using this drive (Usually C:\)
-cd $Env:WinDir
+    # Stage Downloads
+    mkdir \tmp-eventlogging\ > $null
+    cd \tmp-eventlogging\
 
 
-# Stage Downloads
-mkdir \tmp-eventlogging\ > $null
-cd \tmp-eventlogging\
+    # Download GPOs
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
 
 
-# Download GPOs
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
+    # Expand Archive
+    [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") > $null
+    [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\EventLogging.zip", "\tmp-eventlogging\EventLogging")
 
 
-# Expand Archive
-[System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") > $null
-[System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\EventLogging.zip", "\tmp-eventlogging\EventLogging")
+    # Import and Create GPOs
+    Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON4\Group-Policy-Objects\SOC-DC-Enhanced-Auditing\" -BackupGpoName "SOC-DC-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-DC-Enhanced-Auditing" > $null
+    Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-WS-Enhanced-Auditing\" -BackupGpoName "SOC-WS-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-WS-Enhanced-Auditing" > $null
+    Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-Enable-WinRM\" -BackupGpoName "SOC-Enable-WinRM" -CreateIfNeeded -TargetName "SOC-Enable-WinRM" > $null
+    Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON2\Group-Policy-Objects\SOC-CMD-PS-Logging\" -BackupGpoName "SOC-CMD-PS-Logging" -CreateIfNeeded -TargetName "SOC-CMD-PS-Logging" > $null
+
+    foreach ($site in $WECSites)
+    {
+        Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON4\Group-Policy-Objects\SOC-Windows-Event-Forwarding\" -BackupGpoName "SOC-Windows Event Forwarding" -CreateIfNeeded -TargetName "SOC-$($site.location)-Windows-Event-Forwarding" > $null
+        # Update Windowns Event Forwarding GPO
+        Set-GPRegistryValue -Name "SOC-$($Site.location)-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager -ValueName "1" -Type String -Value (-join("Server=http://", "$($site.wec)", ":5985/wsman/SubscriptionManager/WEC,Refresh=60"))
+        # Confirm WEF GPO value is correct by writing to stdout
+        Write-host "GPO value for $($site.location) is set to $($(Get-GPRegistryValue -Name "SOC-$($site.location)-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager).value)"
+    }
+
+    # Destroy staging directory
+    cd $Env:WinDir
+    rm \tmp-eventlogging\ -R -Force
 
 
-# Import and Create GPOs
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON4\Group-Policy-Objects\SOC-DC-Enhanced-Auditing\" -BackupGpoName "SOC-DC-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-DC-Enhanced-Auditing" > $null
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-WS-Enhanced-Auditing\" -BackupGpoName "SOC-WS-Enhanced-Auditing" -CreateIfNeeded -TargetName "SOC-WS-Enhanced-Auditing" > $null
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\Group-Policy-Objects\SOC-Enable-WinRM\" -BackupGpoName "SOC-Enable-WinRM" -CreateIfNeeded -TargetName "SOC-Enable-WinRM" > $null
-Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON2\Group-Policy-Objects\SOC-CMD-PS-Logging\" -BackupGpoName "SOC-CMD-PS-Logging" -CreateIfNeeded -TargetName "SOC-CMD-PS-Logging" > $null
+    # write-host("New GPO SOC-Sysmon Deployment requires additional configuration and linking")
+    write-host("Group policies have been imported for SOC-DC-Enhanced-Auditing, SOC-Windows Event Forwarding, SOC-WS-Enhanced-Auditing, SOC-Enable-WinRM, and SOC-CMD-PS-Logging. These policies need to be linked before their settings are applied.")
 
-foreach ($site in $WECSites)
-{
-    Import-GPO -Path "\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON4\Group-Policy-Objects\SOC-Windows-Event-Forwarding\" -BackupGpoName "SOC-Windows Event Forwarding" -CreateIfNeeded -TargetName "SOC-$($site.location)-Windows-Event-Forwarding" > $null
-    # Update Windowns Event Forwarding GPO
-    Set-GPRegistryValue -Name "SOC-$($Site.location)-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager -ValueName "1" -Type String -Value (-join("Server=http://", "$($site.wec)", ":5985/wsman/SubscriptionManager/WEC,Refresh=60"))
-    # Confirm WEF GPO value is correct by writing to stdout
-    Write-host "GPO value for $($site.location) is set to $($(Get-GPRegistryValue -Name "SOC-$($site.location)-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager).value)"
+
+    # Return to directory of this script
+    cd $startdir
 }
 
-# Destroy staging directory
-cd $Env:WinDir
-rm \tmp-eventlogging\ -R -Force
+Function Get-CSVFilePath
+{
+    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
 
+  $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+  $OpenFileDialog.initialDirectory = "C:\"
+  $OpenFileDialog.filter = "CSV (*.csv) | *.csv"
+  $OpenFileDialog.ShowDialog() | Out-Null
+  return $OpenFileDialog.FileName
+}
 
-# write-host("New GPO SOC-Sysmon Deployment requires additional configuration and linking")
-write-host("Group policies have been imported for SOC-DC-Enhanced-Auditing, SOC-Windows Event Forwarding, SOC-WS-Enhanced-Auditing, SOC-Enable-WinRM, and SOC-CMD-PS-Logging. These policies need to be linked before their settings are applied.")
-
-
-# Return to directory of this script
-cd $startdir
+invoke-main
