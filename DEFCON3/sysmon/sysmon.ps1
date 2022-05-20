@@ -27,7 +27,7 @@ if ($checksharelog -eq $false)
 cd $Env:WinDir
 
 #Add exclusion for sysmonconfig due to false posisitve in windows Defender.
-Add-MpPreference -ExclusionPath "C:\Windows\sysmonconfig.xml"
+Add-MpPreference -ExclusionPath $localsysmonconfig
 Add-MpPreference -ExclusionPath $sysmonshareconfig
 #if file has been removed copy it back down.
 if($(test-path $localsysmonconfig) -eq $false){copy-item $sysmonshareconfig $localsysmonconfig}
