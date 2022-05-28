@@ -26,6 +26,11 @@ if ($checksharelog -eq $false)
 # Change to WinDir directory, script will perform work using this drive (Usually C:\)
 cd $Env:WinDir
 
+#Add exclusion for sysmonconfig due to false posisitve in windows Defender.
+Add-MpPreference -ExclusionPath $localsysmonconfig
+Add-MpPreference -ExclusionPath $sysmonshareconfig
+#if file has been removed copy it back down.
+if($(test-path $localsysmonconfig) -eq $false){copy-item $sysmonshareconfig $localsysmonconfig}
 
 Function main{
 
