@@ -16,7 +16,7 @@ cp $startdir\ca.crt \tmp-eventlogging\ca.crt
 
 # Download Tools
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.13.2-windows-x86_64.zip -OutFile "WinLogBeat.zip"
+Invoke-WebRequest -URI https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-7.17.3-windows-x86_64.zip -OutFile "WinLogBeat.zip"
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
 
 
