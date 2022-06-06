@@ -23,7 +23,7 @@ Move-item '\Program Files\Winlogbeat\' '\Program Files\Winlogbeat-old'
 
 
 Expand-Archive .\WinLogBeat.zip '\Program Files\'
-Rename-Item '\Program Files\winlogbeat-7.15.1-windows-x86_64' WinLogBeat
+Rename-Item '\Program Files\winlogbeat-7.17.3-windows-x86_64' WinLogBeat
 
 
 cd '\Program Files\WinLogBeat\'
