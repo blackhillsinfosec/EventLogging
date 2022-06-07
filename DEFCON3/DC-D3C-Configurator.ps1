@@ -41,6 +41,20 @@ function invoke-main {
         # Confirm WEF GPO value is correct by writing to stdout
         Write-host "GPO value for $($site.location) is set to $($(Get-GPRegistryValue -Name "SOC-$($site.location)-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager).value)"
     }
+    
+    # Add exclusions to the Windows Event Forwarding to prevent WECs from doubling logs
+    foreach ($site in $WECSites)
+    {
+        # Select each GPO
+        $GPOADObject = [ADSI]"LDAP://$($(Get-GPO "SOC-$($Site.location)-Windows-Event-Forwarding").path)"
+        # Apply each WEC to each GPO
+        foreach ($wec in $WECSites) {
+            # Set Apply group policy to deny for each WEC
+            $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $($(Get-ADComputer $($wec.wec.Split("."))[0]).sid),"ExtendedRight","Deny",$([system.guid]"edacfd8f-ffb3-11d1-b41d-00a0c968f939"),"All"
+            $GPOADObject.ObjectSecurity.AddAccessRule($ace)
+            $GPOADObject.CommitChanges()
+        }
+    }
 
     # Destroy staging directory
     cd $Env:WinDir
