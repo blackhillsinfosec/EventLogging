@@ -1,6 +1,6 @@
 function invoke-main {
     #Collect path to site dictionary file from user.
-    Write-host "An Exploer window will open shortly please select the site definition csv file"
+    Write-host "An Explorer window will open shortly please select the site definition csv file"
     Start-sleep -seconds 3
     $WECSites = Import-csv $(Get-CSVFilePath)
     
