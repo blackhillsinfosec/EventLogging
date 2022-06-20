@@ -61,6 +61,11 @@ Once the files have been edited you can run the scripts on the respective host. 
 
 ---
 
+## Video Webcast
+* BHIS Webcasts | [Youtube](https://www.youtube.com/watch?v=Eix5BPta56E&t=2s)
+
+--- 
+
 ## Community Contributions
 * palantir windows-event-forwarding | [GitHub](https://github.com/palantir/windows-event-forwarding)
 * olafhartong sysmon-modular | [GitHub](https://github.com/olafhartong/sysmon-modular)
