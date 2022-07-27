@@ -4,9 +4,7 @@ function invoke-main {
     Start-sleep -seconds 3
     $WECSites = Import-csv $(Get-CSVFilePath)
 
-    # Get working directory of this script to return to
-    $invocation = $MyInvocation.MyCommand.Path
-    $startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
              
     # Change to WinDir directory, script will perform work using this drive (Usually C:\)
     cd $Env:WinDir
@@ -62,8 +60,7 @@ function invoke-main {
     write-host("Group policies have been imported for SOC-Windows-Event-Forwarding and SOC-Enable-WinRM. This policy need to be linked before its settings are applied.")
 
 
-    # Return to directory of this script
-    cd $startdir
+
 }
 
 Function Get-CSVFilePath
@@ -77,4 +74,10 @@ Function Get-CSVFilePath
   return $OpenFileDialog.FileName
 }
 
+# Get working directory of this script to return to
+$startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
 invoke-main
+
+# Return to directory of this script
+cd $startdir
