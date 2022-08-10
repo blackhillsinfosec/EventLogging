@@ -1,3 +1,5 @@
+$ProgressPreference = 'SilentlyContinue' #Disable status bar
+
 # Get working directory of this script to return to
 $invocation = $MyInvocation.MyCommand.Path
 $startdir = Split-Path -Parent $MyInvocation.MyCommand.Path
