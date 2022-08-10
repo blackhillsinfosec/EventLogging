@@ -1,3 +1,5 @@
+$ProgressPreference = 'SilentlyContinue' #Disable status bar
+
 #Input SysmonShare
 $sysmonshare = Read-Host("Enter Sysmon UNC path: ")
 

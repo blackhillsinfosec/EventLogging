@@ -1,3 +1,5 @@
+$ProgressPreference = 'SilentlyContinue' #Disable status bar
+
 function invoke-main {
     #Collect path to site dictionary file from user.
     Write-host "An Explorer window will open shortly please select the site definition csv file"
