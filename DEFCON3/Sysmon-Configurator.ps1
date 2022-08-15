@@ -22,13 +22,14 @@ cd \tmp-eventlogging\
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
+Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/master.zip -OutFile "sysmon-modular.zip"
 Invoke-WebRequest -URI https://download.sysinternals.com/files/Sysmon.zip -OutFile "Sysmon.zip"
-
 
 # Expand Archive
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") > $null
 [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\EventLogging.zip", "\tmp-eventlogging\EventLogging")
 [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon.zip", "\tmp-eventlogging\sysmon")
+[System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon-modular.zip", "\tmp-eventlogging\sysmon-modular")
 
 
 #Update sysmon.ps1 with Sysmon Share Location
@@ -38,7 +39,7 @@ $SysmonPS1 = '\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\
 
 # Copy to DC or share accessible by everyone
 cp \tmp-eventlogging\sysmon\* $sysmonshare
-cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmonconfig.xml $sysmonshare
+cp \tmp-eventlogging\sysmon-modular\sysmonconfig.xml $sysmonshare
 cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmon.ps1 $sysmonshare
 $null > $sysmonshare\sysmon-deploy.log
 
