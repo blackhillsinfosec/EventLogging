@@ -22,7 +22,7 @@ cd \tmp-eventlogging\
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
-Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/master.zip -OutFile "sysmon-modular.zip"
+Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/archive/refs/heads/master.zip -OutFile "sysmon-modular.zip"
 Invoke-WebRequest -URI https://download.sysinternals.com/files/Sysmon.zip -OutFile "Sysmon.zip"
 
 # Expand Archive
@@ -39,7 +39,7 @@ $SysmonPS1 = '\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\
 
 # Copy to DC or share accessible by everyone
 cp \tmp-eventlogging\sysmon\* $sysmonshare
-cp \tmp-eventlogging\sysmon-modular\sysmonconfig.xml $sysmonshare
+cp \tmp-eventlogging\sysmon-modular\sysmon-modular-master\sysmonconfig.xml $sysmonshare
 cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmon.ps1 $sysmonshare
 $null > $sysmonshare\sysmon-deploy.log
 
@@ -61,4 +61,4 @@ rm \tmp-eventlogging\ -R -Force
 
 
 # Return to directory of this script
-cd $startdir
+cd $startdirg
