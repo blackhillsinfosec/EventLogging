@@ -1,3 +1,7 @@
+param (
+    [string]$SysmonConfig
+)
+
 $ProgressPreference = 'SilentlyContinue' #Disable status bar
 
 #Input SysmonShare
@@ -40,10 +44,34 @@ if (!(Test-Path $sysmonshare\Archive)){New-Item -ItemType Directory -Name "Archi
 else{Remove-Item -Path $sysmonshare\Archive\* -Force}
 Get-ChildItem $sysmonshare -Exclude Archive | Copy-Item -Destination $sysmonshare\Archive
  
+#Configure Sysmon config file
+function SysmonConfig {
+    if($SysmonConfig){
+        #Test that current user can access specified config file
+        if (Test-Path $SysmonConfig){
+            #Copy config file to UNC path
+            Copy-Item $SysmonConfig $sysmonshare\sysmonconfig.xml
+        }
+        else {
+            #File not accessable to current user. Prompt for path again.
+            write-host "Unable to access Sysmon config at path specified"
+            $SysmonConfig = Read-Host -Prompt "Please specify path to Sysmon config file"
+            SysmonConfig
+        }
+    
+    }
+    else {
+        #Download and install Sysmon-Modular
+        Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/archive/refs/heads/master.zip -OutFile "sysmon-modular.zip"
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon-modular.zip", "\tmp-eventlogging\sysmon-modular")
+        copy-item \tmp-eventlogging\sysmon-modular\sysmon-modular-master\sysmonconfig.xml $sysmonshare\sysmonconfig.xml
+    }
+}
+
+SysmonConfig
 
 # Copy to DC or share accessible by everyone
 cp \tmp-eventlogging\sysmon\* $sysmonshare
-cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmonconfig.xml $sysmonshare
 cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmon.ps1 $sysmonshare
 $null > $sysmonshare\sysmon-deploy.log
 
