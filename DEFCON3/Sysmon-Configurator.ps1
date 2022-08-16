@@ -1,3 +1,7 @@
+param (
+    [string]$SysmonConfig
+)
+
 $ProgressPreference = 'SilentlyContinue' #Disable status bar
 
 #Input SysmonShare
@@ -17,19 +21,42 @@ cd $Env:WinDir
 mkdir \tmp-eventlogging\ > $null
 cd \tmp-eventlogging\
 
+#Import Sysmon Config
+function SysmonConfig {
+    if($SysmonConfig){
+        #Test that current user can access specified config file
+        if (Test-Path $SysmonConfig){
+            #Copy config file to UNC path
+            Copy-Item $SysmonConfig $sysmonshare\sysmonconfig.xml
+        }
+        else {
+            #File not accessable to current user. Prompt for path again.
+            write-host "Unable to access Sysmon config at path specified"
+            $SysmonConfig = Read-Host -Prompt "Please specify path to Sysmon config file"
+            SysmonConfig
+        }
+    
+    }
+    else {
+        #Download and install Sysmon-Modular
+        Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/archive/refs/heads/master.zip -OutFile "sysmon-modular.zip"
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon-modular.zip", "\tmp-eventlogging\sysmon-modular")
+        copy-item \tmp-eventlogging\sysmon-modular\sysmon-modular-master\sysmonconfig.xml $sysmonshare\sysmonconfig.xml
+    }
+}
+
+SysmonConfig
 
 # Download GPOs
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "EventLogging.zip"
-Invoke-WebRequest -URI https://github.com/olafhartong/sysmon-modular/archive/refs/heads/master.zip -OutFile "sysmon-modular.zip"
 Invoke-WebRequest -URI https://download.sysinternals.com/files/Sysmon.zip -OutFile "Sysmon.zip"
 
 # Expand Archive
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") > $null
 [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\EventLogging.zip", "\tmp-eventlogging\EventLogging")
 [System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon.zip", "\tmp-eventlogging\sysmon")
-[System.IO.Compression.ZipFile]::ExtractToDirectory("\tmp-eventlogging\sysmon-modular.zip", "\tmp-eventlogging\sysmon-modular")
 
 
 #Update sysmon.ps1 with Sysmon Share Location
@@ -39,7 +66,6 @@ $SysmonPS1 = '\tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\
 
 # Copy to DC or share accessible by everyone
 cp \tmp-eventlogging\sysmon\* $sysmonshare
-cp \tmp-eventlogging\sysmon-modular\sysmon-modular-master\sysmonconfig.xml $sysmonshare
 cp \tmp-eventlogging\EventLogging\EventLogging-master\DEFCON3\sysmon\sysmon.ps1 $sysmonshare
 $null > $sysmonshare\sysmon-deploy.log
 
