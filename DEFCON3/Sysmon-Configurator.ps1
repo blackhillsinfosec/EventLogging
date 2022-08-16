@@ -87,4 +87,4 @@ rm \tmp-eventlogging\ -R -Force
 
 
 # Return to directory of this script
-cd $startdirg
+cd $startdir
