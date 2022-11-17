@@ -17,11 +17,9 @@ foreach($line in Get-Content C:\temp\subscriptions.txt) {wecutil ss /e:false $li
 foreach($line in Get-Content C:\temp\subscriptions.txt) {wecutil ds $line}
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "C:\temp\EventLogging.zip"
 Expand-Archive C:\temp\EventLogging.zip
-wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC1_AD_AUTH.xml"
-wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC2_os_app_events.xml"
-wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC3_sec_events.xml"
-wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC4_os_app_events.xml"
-wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC5_app_events.xml"
+cd "c:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions"
+foreach ($file in (Get-ChildItem *.xml)) {wecutil cs $file}
 remove-item "C:\temp\subscriptions.txt"
 remove-item "c:\temp\EventLogging.zip"
 remove-item -path "c:\temp\EventLogging\" -recurse 
+wecutil es
