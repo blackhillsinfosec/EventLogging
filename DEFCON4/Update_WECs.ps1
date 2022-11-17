@@ -21,6 +21,7 @@ wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\W
 wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC2_os_app_events.xml"
 wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC3_sec_events.xml"
 wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC4_os_app_events.xml"
+wecutil cs "C:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions\WEC5_app_events.xml"
 remove-item "C:\temp\subscriptions.txt"
 remove-item "c:\temp\EventLogging.zip"
 remove-item -path "c:\temp\EventLogging\" -recurse 
