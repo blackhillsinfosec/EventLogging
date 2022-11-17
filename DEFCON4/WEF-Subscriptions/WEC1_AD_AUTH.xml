@@ -1,0 +1,249 @@
+<Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
+  <SubscriptionId>WEC1_AD_auth_Events</SubscriptionId>
+  <SubscriptionType>SourceInitiated</SubscriptionType>
+  <Description>Events related to Active Directory Federation Services.</Description>
+  <Enabled>true</Enabled>
+  <Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+  <ConfigurationMode>Custom</ConfigurationMode>
+  <Delivery Mode="Push">
+    <Batching>
+      <MaxItems>25</MaxItems>
+      <MaxLatencyTime>300000</MaxLatencyTime>
+    </Batching>
+    <PushSettings>
+      <Heartbeat Interval="14400000"/>
+    </PushSettings>
+  </Delivery>
+  <Query><![CDATA[
+    <QueryList>
+      <Query Id="0" Path="Security">
+        <Select Path="Security">*[System[Provider[@Name='AD FS Auditing']]]</Select>
+      </Query>
+      <Query Id="1" Path="AD FS/Admin">
+        <Select Path="AD FS/Admin">*[System[Provider[@Name='AD FS']]]</Select>
+      </Query>
+      <Query Id="2" Path="AD FS Tracing/Debug">
+        <Select Path="AD FS Tracing/Debug">*</Select>
+      </Query>
+      <Query Id="3" Path="Duo Authentication for AD FS">
+        <Select Path="Duo Authentication for AD FS">*</Select>
+	  </Query>
+      <Query Id="4" Path="Security">
+        <!-- For Domain Accounts event is created on DC-->
+        <!-- For Local Accounts event is created locally-->
+        <!-- 4740: Account Lockouts -->
+        <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and EventID=4740]]</Select>
+	  </Query>
+      <Query Id="5" Path="Security">
+        <!-- 4627: Group Membership Information -->
+        <Select Path="Security">*[System[(EventID=4627)]]</Select>
+        <!-- 4703: A user right was adjusted. -->
+        <!-- 4704: A user right (privilege) was assigned. -->
+        <!-- 4704: A user right (privilege) was removed. -->
+        <Select Path="Security">*[System[(EventID=4703 or EventID=4704 or EventID=4705)]]</Select>
+        <!-- 4720: A user account was created. -->
+        <Select Path="Security">*[System[(EventID=4720)]]</Select>
+        <!-- 4722: A user account was enabled. -->
+        <!-- 4723: Attempt was made to change account's password. -->
+        <!-- 4724: An attempt was made to reset an account's password. -->
+        <!-- 4725: A user account was disabled. -->
+        <!-- 4726: A user account was deleted. -->
+        <!-- 4727: A security-enabled global group was created. -->
+        <!-- 4728: A member was added to a security-enabled global group. -->
+        <!-- 4729: A member was removed to a security-enabled global group. -->
+        <!-- 4730: A security-enabled global group was deleted. -->
+        <!-- 4731: A security-enabled local group was created. -->
+        <!-- 4732: A member was added to a security-enabled local group. -->
+        <!-- 4733: A member was removed from a security-enabled local group. -->
+        <!-- 4734: A security-enabled local group was deleted. -->
+        <!-- 4735: Modification of Security-enabled groups -->
+        <!-- 4737: A security-enabled global group was changed. -->
+        <!-- 4738: A user account was changed. -->
+        <!-- 4739: Domain Policy was changed. -->
+        <!-- 4741: A computer account was created. -->
+        <!-- 4742: A computer account was changed. -->
+        <!-- 4743: A computer account was deleted. -->
+        <!-- 4744: A security-disabled local group was created. -->
+        <!-- 4745: A security-disabled local group was changed. -->
+        <!-- 4746: A member was added to a security-disabled local group. -->
+        <!-- 4747: A member was removed from a security-disabled local group. -->
+        <!-- 4748: A security-disabled local group was deleted. -->
+        <!-- 4749: A security-disabled global group was created. -->
+        <!-- 4750: A security-disabled global group was changed. -->
+        <!-- 4751: A member was added to a security-disabled global group. -->
+        <!-- 4752: A member was removed from a security-disabled global group. -->
+        <!-- 4753: A security-disabled global group was deleted. -->
+        <!-- 4754: A security-enabled universal group was created. -->
+        <!-- 4755: A security-enabled universal group was changed. -->
+        <!-- 4756: A security-enabled universal group was changed. -->
+        <!-- 4757: A security-enabled universal group was changed. -->
+        <!-- 4758: A security-enabled universal group was created. -->
+        <!-- 4759: A security-disabled universal group was created. -->
+        <!-- 4760: A security-disabled universal group was changed. -->
+        <!-- 4761: A member was added to a security-disabled universal group. -->
+        <!-- 4762: A member was removed from a security-disabled universal group. -->
+        <!-- 4763: A security-disabled universal group was deleted. -->
+        <!-- 4764: A group's type was changed. -->
+        <!-- 4765: SID History was added to an account. -->
+        <!-- 4766: An attempt to add SID History to an account failed. -->
+        <!-- 4767: A user account was unlocked. -->
+        <Select Path="Security">*[System[(EventID &gt;=4722 and EventID &lt;=4735)]]</Select>
+        <Select Path="Security">*[System[(EventID &gt;=4737 and EventID &lt;=4739)]]</Select>
+        <Select Path="Security">*[System[(EventID &gt;=4741 and EventID &lt;=4767)]]</Select>
+        <!-- 4780: The ACL was set on accounts which are members of administrators group. -->
+        <!-- 4781: The name of an account was changed. -->
+        <!-- 4782: The password hash an account was accessed. -->
+        <Select Path="Security">*[System[(EventID &gt;=4780 and EventID &lt;=4782)]]</Select>
+        <!-- 4793: The Password Policy Checking API was called. -->
+        <!-- 4794: An attempt was made to set the Directory Services Restore Mode administrator password. -->
+        <Select Path="Security">*[System[(EventID=4793 or EventID=4794)]]</Select>
+        <!-- 4798: A user's local group membership was enumerated. -->
+        <!-- 4799: A security-enabled local group membership was enumerated. -->
+        <Select Path="Security">*[System[(EventID=4798 or EventID=4799)]]</Select>
+        <!-- 5376: Credential Manager credentials were backed up. -->
+        <!-- 5377: Credential Manager credentials were restored from a backup. -->
+        <Select Path="Security">*[System[(EventID=5376 or EventID=5377)]]</Select>
+	  </Query>
+      <Query Id="6" Path="Security">
+        <!-- 4662: Directory Service Access Operation Performed On An Object --> 
+        <Select Path="Security">*[System[(EventID=4662)]] and *[System[Task='14080']]</Select>
+      </Query>
+      <Query Id="1" Path="Security">
+        <!-- 5136: A directory service object was modified. --> 
+        <!-- 5137: A directory service object was created. --> 
+        <!-- 5138: A directory service object was undeleted. --> 
+        <!-- 5139: A directory service object was moved. --> 
+        <!-- 5141: A directory service object was deleted. --> 
+        <Select Path="Security">*[System[(EventID=5136 or EventID=5137 or EventID=5178 or EventID=5139 or EventID=5141)]]</Select>
+      </Query>
+      <Query Id="7" Path="Security">
+        <!-- 4713: Kerberos Policy was changed. -->
+        <Select Path="Security">*[System[(EventID=4713)]]</Select>
+      </Query>
+      <Query Id="8" Path="Security">
+        <!-- 4706: A new trust was created to a domain. -->
+        <!-- 4707: A trust to a domain was removed. -->
+        <!-- 4716: Trusted domain information was modified. -->
+        <!-- 4717: System security access was granted to an account. -->
+        <!-- 4718: System security access was removed from an account. -->
+        <!-- 4739: Domain Policy was changed. -->
+        <!-- 4864: A namespace collision was detected. -->
+        <!-- 4865: A trusted forest information entry was added. -->
+        <!-- 4866: A trusted forest information entry was removed. -->
+        <!-- 4867: A trusted forest information entry was modified. -->
+        <Select Path="Security">*[System[(EventID=4706 or EventID=4707 or EventID=4716 or EventID=4717 or EventID=4718 or EventID=4739 or EventID=4864 or EventID=4865 or EventID=4866 or EventID=4867)]]</Select>
+	  </Query>
+      <Query Id="9" Path="Security">
+        <!-- 4624: An account was successfully logged on. -->
+        <!-- 4625: An account failed to log on. -->
+        <!-- 4626: User/Device claims information. -->
+        <Select Path="Security">*[System[(EventID &gt;=4624 and EventID &lt;=4626)]]</Select>
+        <!-- 4634: An account was successfully logged off. -->
+        <!-- 4647: User initiated logoff. -->
+        <!-- 4649: A replay attack was detected. -->
+        <!-- 4672: Special privileges assigned to a new logon, administrative logins -sa, -ada, etc. -->
+        <!-- 4675: SIDs were filtered. -->
+        <Select Path="Security">*[System[(EventID=4634 or EventID=4647 or EventID=4649 or EventID=4672 or EventID=4675)]]</Select>
+        <!-- 4774: An account was mapped for logon. -->
+        <!-- 4775: An account could not be mapped for logon. -->
+        <!-- 4776: The computer attempted to validate the credentials for an account. -->
+        <!-- 4777: The domain controller failed to validate the credentials for an account. -->
+        <!-- 4778: A session was reconnected to a Window Station. -->
+        <!-- 4779: A session was disconnected from a Window Station. -->
+        <Select Path="Security">*[System[(EventID &gt;=4774 and EventID &lt;=4779)]]</Select>
+        <!-- 4800 The workstation was locked. -->
+        <!-- 4801 The workstation was unlocked. -->
+        <!-- 4802 The screen saver was invoked. -->
+        <!-- 4803 The screen saver was dismissed. -->
+        <Select Path="Security">*[System[(EventID &gt;=4800 and EventID &lt;=4803)]]</Select>
+        <!-- 4964: Special groups have been assigned a new logon. -->
+        <Select Path="Security">*[System[(EventID=4964)]]</Select>
+        <!-- 5378 The requested credentials delegation was disallowed by policy. -->
+        <Select Path="Security">*[System[(EventID=5378)]]</Select>
+        <!-- Suppress SECURITY_LOCAL_SYSTEM_RID A special account used by the OS, noisy -->
+        <Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress>
+	  </Query>
+      <Query Id="10" Path="Application">
+        <!-- Duo Security Events -->
+        <Select Path="Application">*[System[Provider[@Name='Duo Security']]]</Select>
+	  </Query>
+      <Query Id="11" Path="Security">
+        <!-- Logging on with Explicit Credentials -->
+        <!-- taskhost.exe (scheduled tasks) is filtered as this is normal behavior. -->
+        <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and EventID=4648]] and *[EventData[Data[@Name='ProcessName']!='C:\Windows\System32\taskhost.exe']]</Select>
+      </Query>
+      <Query Id="12" Path="System">
+        <!-- Group Policy Service Errors -->
+        <!-- 1085: Application of Group Policy failures -->
+        <!-- 1125: Group Policy Service -->
+        <!-- 1127: Group Policy Service-->
+        <!-- 1129: Group Policy Preprocessing Networking -->
+        <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and Level=2 and (EventID=1085 or EventID=1125 or EventID=1127 or EventID=1129)]]</Select>
+      </Query>
+      <Query Id="13" Path="Security">
+        <!-- Group Policy Info -->
+        <!-- 6144: Security policy in the group policy objects has been applied successfully. -->
+        <!-- 6145: One or more errors occurred while processing security policy in the group policy objects. -->
+        <Select Path="Security">*[System[(EventID=6144 or EventID=6145)]]</Select>
+	  </Query>
+      <Query Id="14" Path="Security">
+        <!-- 4768 - A Kerberos authentication ticket (TGT) was requested -->
+        <!-- 4769 - A Kerberos service ticket was requested -->
+        <!-- 4770 - A Kerberos service ticket was renewed -->
+        <!-- 4771 - A Kerberos pre-authentication failed. -->
+        <!-- 4772 - A Kerberos authentication ticket request failed. -->
+        <!-- 4773 - A Kerberos service ticket request failed. -->
+        <Select Path="Security">*[System[(EventID=4768 or EventID=4769 or EventID=4770 or EventID=4771 or EventID=4772 or EventID=4773)]]</Select>
+	  </Query>
+      <Query Id="15" Path="Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController">
+        <Select Path="Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select>
+        <Select Path="Microsoft-Windows-Authentication/ProtectedUserFailures-DomainController">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select>
+        <Select Path="Microsoft-Windows-NTLM/Operational">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select>
+	  </Query>
+      <Query Id="16" Path="Security">
+        <!-- 4673: A privileged service was called.. -->
+        <!-- 4674: An operation was attempted on a privileged object.. -->
+        <!-- 4985: The state of a transaction has changed.. -->
+        <Select Path="Security">*[System[(EventID=4673 or EventID=4674 or EventID=4985)]]</Select>
+	  </Query>
+      <Query Id="17" Path="Security">
+        <!-- 5140: Network share object access -->
+        <!-- 5142: Network Share create -->
+        <!-- 5144: Network Share Delete -->
+        <!-- 5145: A network share object was checked to see whether client can be granted desired access -->
+        <!-- 5168: SPN check for SMB/SMB2 failed. -->
+        <Select Path="Security">*[System[(EventID=5140 or EventID=5142 or EventID=5144 or EventID=5145 or EventID=5168)]]</Select>
+      </Query>
+      <Query Id="18" Path="Microsoft-Windows-SMBClient/Operational">
+        <!-- All UNC/mapped drive successful connection -->
+        <Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(EventID=30622 or EventID=30624)]]</Select>
+      </Query>
+      <Query Id="19" Path="Microsoft-Windows-SMBClient/Security">
+        <!-- All SMB Client Security Alerts -->
+        <Select Path="Microsoft-Windows-SMBClient/Security">*</Select>
+      </Query>
+      <Query Id="20" Path="Microsoft-Windows-SMBServer/Security">
+        <!-- All SMB Server Security Alerts -->
+        <Select Path="Microsoft-Windows-SMBServer/Security">*</Select>
+	  </Query>
+	  <Query Id="21" Path="Microsoft-Windows-SmartCard-Audit/Authentication">
+        <!-- Gets all Smart-card Card-Holder Verification (CHV) events (success and failure) performed on the host. -->
+        <Select Path="Microsoft-Windows-SmartCard-Audit/Authentication">*</Select>
+      </Query>
+	  <Query Id="22" Path="Microsoft-Windows-WMI-Activity/Operational">
+        <Select Path="Microsoft-Windows-WMI-Activity/Operational">*</Select>
+      </Query>
+      <Query Id="23" Path="Microsoft-Windows-TPM-WMI">
+        <!-- 513: TPM Owner Authorization information was backed up successfully to Active Directory Domain Services. -->
+        <!-- 514: Failed to backup TPM Owner Authorization information to Active Directory Domain Services. -->
+        <Select Path="Microsoft-Windows-TPM-WMI">*</Select>
+     </Query>	 
+    </QueryList>]]></Query>
+  <ReadExistingEvents>true</ReadExistingEvents>
+  <TransportName>http</TransportName>
+  <ContentFormat>RenderedText</ContentFormat>
+  <Locale Language="en-US"/>
+  <LogFile>ForwardedEvents</LogFile>
+  <AllowedSourceNonDomainComputers/>
+  <AllowedSourceDomainComputers>O:NSG:NSD:(A;;GA;;;DC)(A;;GA;;;NS)(A;;GA;;;DD)</AllowedSourceDomainComputers>
+</Subscription>
