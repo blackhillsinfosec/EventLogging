@@ -54,11 +54,13 @@ function invoke-main {
     }
 
     # Update Windowns Event Forwarding GPO
-    Set-GPRegistryValue -Name "SOC-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager -ValueName "1" -Type String -Value (-join("Server=http://", "$wechost", ":5985/wsman/SubscriptionManager/WEC,Refresh=60"))
+    # Appears to be redundant and unnecessary based on foreach loops above
+    # Set-GPRegistryValue -Name "SOC-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager -ValueName "1" -Type String -Value (-join("Server=http://", "$wechost", ":5985/wsman/SubscriptionManager/WEC,Refresh=60"))
 
 
     # Confirm WEF GPO value is correct
-    Get-GPRegistryValue -Name "SOC-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager
+    # Appears to be redundant and unnecessary based on foreach loops above
+    # Get-GPRegistryValue -Name "SOC-Windows-Event-Forwarding" -Key HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\EventLog\EventForwarding\SubscriptionManager
 
 
     # Destroy staging directory
@@ -74,13 +76,23 @@ function invoke-main {
 
 Function Get-CSVFilePath
 {
-    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+# wrap windows.forms in try-catch to prevent failure on Server Core
+    try {
+        [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+        $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+        $OpenFileDialog.initialDirectory = "C:\"
+        $OpenFileDialog.filter = "CSV (*.csv) | *.csv"
+        $OpenFileDialog.ShowDialog() | Out-Null
+        $output = $OpenFileDialog.FileName
+    } catch {
+    # do-while to ensure that path provided actually points to a file
+        do {
+            $output = Read-Host -Prompt "Which sites.csv file:"
+        } while (-not (Test-Path -Path $output -PathType Leaf))
+    } 
 
-  $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-  $OpenFileDialog.initialDirectory = "C:\"
-  $OpenFileDialog.filter = "CSV (*.csv) | *.csv"
-  $OpenFileDialog.ShowDialog() | Out-Null
-  return $OpenFileDialog.FileName
+    return $output
+
 }
 
 # Get working directory of this script to return to
