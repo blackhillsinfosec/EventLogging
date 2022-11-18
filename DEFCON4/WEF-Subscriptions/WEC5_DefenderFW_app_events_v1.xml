@@ -1,5 +1,5 @@
 <Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
-  <SubscriptionId>WEC5_app_events</SubscriptionId>
+  <SubscriptionId>WEC5_DefenderFW_app_events_v1</SubscriptionId>
   <SubscriptionType>SourceInitiated</SubscriptionType>
   <Description>Application crashes, hangs and error reporting logs.</Description>
   <Enabled>true</Enabled>
@@ -81,42 +81,6 @@
         <Select Path="Security">*[System[(EventID &gt;=5027 and EventID &lt;=5030)]]</Select>
         <Select Path="Security">*[System[(EventID &gt;=5032 and EventID &lt;=5035)]]</Select>
       </Query>
-	  <Query Id="8" Path="Application">
-        <!-- MSI Installer Notifications -->
-        <Select Path="Application">*[System[Provider[@Name='MsiInstaller'] and (EventID=1022 or EventID=1033)]]</Select>
-        <!-- The change status of a Update Package -->
-        <!-- Installed Update Packages -->
-        <Select Path="Setup">*[System[Provider[@Name='Microsoft-Windows-Servicing'] and EventID=2 and Level=0]] and *[UserData[CbsPackageChangeState[IntendedPackageState='Installed']]] </Select>
-        <!-- User Application Installation Activities -->
-        <Select Path="Microsoft-Windows-Application-Experience/Program-Inventory">*[System[Provider[@Name='Microsoft-Windows-Application-Experience'] and (EventID=903 or EventID=904)]]</Select>
-        <!-- User Application Update -->
-        <Select Path="Microsoft-Windows-Application-Experience/Program-Inventory">*[System[Provider[@Name='Microsoft-Windows-Application-Experience'] and (EventID=905 or EventID=906)]]</Select>
-        <!-- User Application Removed Activities -->
-        <Select Path="Microsoft-Windows-Application-Experience/Program-Inventory">*[System[Provider[@Name='Microsoft-Windows-Application-Experience'] and (EventID=907 or EventID=908)]]</Select>
-        <!-- Applications Inventory -->
-        <Select Path="Microsoft-Windows-Application-Experience/Program-Inventory">*[System[Provider[@Name='Microsoft-Windows-Application-Experience'] and EventID=800]]</Select>
-      </Query>
-	  <Query Id="9" Path="OAlerts">
-        <!-- All Microsoft Office Events -->
-        <Select Path="OAlerts">*</Select>
-      </Query>
-	  <Query Id="10" Path="System">
-        <!-- System startup (12 - includes OS/SP/Version) and shutdown -->
-        <!-- 4608: Windows is starting up -->
-        <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and (EventID=12 or EventID=13)]]</Select>
-        <Select Path="Security">*[System[(EventID=4608)]]</Select>
-      </Query>
-      <!-- Shutdown events -->
-      <Query Id="11" Path="System">
-        <!-- Shutdown initiate requests, with user, process and reason (if supplied) -->
-        <Select Path="System">*[System[Provider[@Name='USER32'] and (EventID=1074)]]</Select>
-      </Query>
-      <!-- OS-level security events -->
-      <!-- <Query Id="24" Path="Security">
-        <!-- 4817: Auditing settings on object were changed. -->
-        <!-- 4826 Boot Configuration Data loaded. -->
-        <Select Path="Security">*[System[(EventID=4817 or EventID=4826)]]</Select>
-      </Query> -->
     </QueryList>]]></Query>
   <ReadExistingEvents>true</ReadExistingEvents>
   <TransportName>http</TransportName>
