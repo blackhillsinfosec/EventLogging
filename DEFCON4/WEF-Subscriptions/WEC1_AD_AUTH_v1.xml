@@ -7,7 +7,7 @@
   <ConfigurationMode>Custom</ConfigurationMode>
   <Delivery Mode="Push">
     <Batching>
-      <MaxItems>150</MaxItems>
+      <MaxItems>250</MaxItems>
       <MaxLatencyTime>300000</MaxLatencyTime>
     </Batching>
     <PushSettings>
