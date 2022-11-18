@@ -51,7 +51,7 @@
         <!-- 4817: Auditing settings on object were changed. -->
         <!-- 4826 Boot Configuration Data loaded. -->
         <Select Path="Security">*[System[(EventID=4817 or EventID=4826)]]</Select>
-      </Query> -->
+      </Query>
     </QueryList>]]></Query>
   <ReadExistingEvents>true</ReadExistingEvents>
   <TransportName>http</TransportName>
