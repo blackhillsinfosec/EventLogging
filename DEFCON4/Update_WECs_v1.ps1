@@ -14,8 +14,8 @@ else
 cd "c:\temp"
 wecutil es > c:\temp\subscriptions.txt
 foreach($line in Get-Content C:\temp\subscriptions.txt) {wecutil ss /e:false $line}
+wecutil es
 foreach($line in Get-Content C:\temp\subscriptions.txt) {wecutil ds $line}
-remove-item -path "c:\temp\EventLogging\" -recurse 
 Invoke-WebRequest -URI https://github.com/blackhillsinfosec/EventLogging/archive/master.zip -OutFile "C:\temp\EventLogging.zip"
 Expand-Archive C:\temp\EventLogging.zip
 cd "c:\temp\EventLogging\EventLogging-master\DEFCON4\WEF-Subscriptions"
