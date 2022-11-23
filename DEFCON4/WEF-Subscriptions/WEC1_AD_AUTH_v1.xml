@@ -241,7 +241,7 @@
     </QueryList>]]></Query>
   <ReadExistingEvents>true</ReadExistingEvents>
   <TransportName>http</TransportName>
-  <ContentFormat>Event</ContentFormat>
+  <ContentFormat>RenderedText</ContentFormat>
   <Locale Language="en-US"/>
   <LogFile>ForwardedEvents</LogFile>
   <AllowedSourceNonDomainComputers/>
