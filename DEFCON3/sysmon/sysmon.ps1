@@ -6,20 +6,20 @@ $sysmonshareexe = "$sysmonshare\sysmon.exe"
 $sysmonshareconfig = "$sysmonshare\sysmonconfig.xml"
 $localsysmonconfig = "$Env:Windir\sysmonconfig.xml"
 $localsysmonexe = "$Env:Windir\sysmon.exe"
-$sysmonsharelog = "$sysmonshare\sysmon-deploy.log"
+$sysmonlog = "$Env:Windir\sysmon-deploy.log"
 
 # Time code will be reused throughout the script for accurate timestamping of log events
 $exectime = Get-Date
 
 
 # Check that the log file exists
-$checksharelog = Test-Path $sysmonsharelog
+$checksharelog = Test-Path $sysmonlog
 
 
 # Create a new log file is one doesn't exist
 if ($checksharelog -eq $false)
 {
-    Set-Content $sysmonsharelog "" -NoNewline
+    Set-Content $sysmonlog "" -NoNewline
 }
 
 
@@ -51,7 +51,7 @@ if(($checkshareexe -eq $true) -and ($checkshareconf -eq $true))
     if (-Not $checkservice)
     {
         $exectime = Get-Date
-        Add-Content $sysmonsharelog "$exectime ---- $hostname ---- No Sysmon service but binary exists"
+        Add-Content $sysmonlog "$exectime ---- $hostname ---- No Sysmon service but binary exists"
     }
 
     if (($checklocalexe -eq $true) -and ($checkservice)) {
@@ -75,12 +75,12 @@ if(($checkshareexe -eq $true) -and ($checkshareconf -eq $true))
             if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig))
             {
                 $exectime = Get-Date
-                Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Updated Sysmon driver."
+                Add-Content $sysmonlog "$exectime ---- $hostname ---- Updated Sysmon driver."
             }
 
             else {
                 $exectime = Get-Date
-                Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Failed updating while copying Sysmon files or starting driver."
+                Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed updating while copying Sysmon files or starting driver."
                 exit
             }
         }
@@ -100,11 +100,11 @@ if(($checkshareexe -eq $true) -and ($checkshareconf -eq $true))
             {
                 cmd /c "$localsysmonexe -c $localsysmonconfig"
                 $exectime = Get-Date
-                Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Updated Sysmon configuration."
+                Add-Content $sysmonlog "$exectime ---- $hostname ---- Updated Sysmon configuration."
             }
             else {
                 $exectime = Get-Date
-                Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Failed to copy new Sysmon config or failed to start driver."
+                Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed to copy new Sysmon config or failed to start driver."
                 exit
             }                     
         }
@@ -115,23 +115,23 @@ if(($checkshareexe -eq $true) -and ($checkshareconf -eq $true))
         # Running install from share has much better success rate than installing locally
         cmd /c "$sysmonshareexe -accepteula -i $sysmonshareconfig"
         $exectime = Get-Date
-        Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Sysmon driver installed."
+        Add-Content $sysmonlog "$exectime ---- $hostname ---- Sysmon driver installed."
         # Make sure copies where successful
         if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig))
         {
             $exectime = Get-Date
-            Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Sysmon files exist"
+            Add-Content $sysmonlog "$exectime ---- $hostname ---- Sysmon files exist"
         }
         else {
             $exectime = Get-Date
-            Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Something went wrong"
+            Add-Content $sysmonlog "$exectime ---- $hostname ---- Something went wrong"
             exit
         }
     }    
 }
 else{
     $exectime = Get-Date
-    Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Failed to find Sysmon files in $sysmonshare."
+    Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed to find Sysmon files in $sysmonshare."
 }
 # Ensure sysmon services are running
 try{
@@ -141,7 +141,7 @@ try{
 }
 catch{
     $exectime = Get-Date
-    Add-Content $sysmonsharelog "$exectime ---- $hostname ---- Failed restarting and or getting status of Sysmon"
+    Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed restarting and or getting status of Sysmon"
     exit
 }
 
