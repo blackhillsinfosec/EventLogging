@@ -1,162 +1,217 @@
-# Set Sysmon related locations
+# Configuration Variables
 $sysmonshare = "<SysmonShareLoc>"
-$hostname = "$env:COMPUTERNAME"
 $service = "Sysmon"
 $sysmonshareexe = "$sysmonshare\sysmon.exe"
 $sysmonshareconfig = "$sysmonshare\sysmonconfig.xml"
 $localsysmonconfig = "$Env:Windir\sysmonconfig.xml"
 $localsysmonexe = "$Env:Windir\sysmon.exe"
 $sysmonlog = "$Env:Windir\sysmon-deploy.log"
+$archivepath = "C:\Sysmon" # The defined archive in the sysmon config
+$archivedays = "30" # Number of days to retain files in the Sysmon Archive
 
-# Time code will be reused throughout the script for accurate timestamping of log events
-$exectime = Get-Date
-
-
-# Check that the log file exists
-$checksharelog = Test-Path $sysmonlog
-
-
-# Create a new log file is one doesn't exist
-if ($checksharelog -eq $false)
-{
-    Set-Content $sysmonlog "" -NoNewline
+function Invoke-Logging([string]$logmessage){
+    Write-Host "`t$logmessage"
+    Add-Content $sysmonlog "$(Get-Date) ---- $logmessage"
 }
 
-
-# Change to WinDir directory, script will perform work using this drive (Usually C:\)
-cd $Env:WinDir
-
-#Add exclusion for sysmonconfig due to false posisitve in windows Defender.
-Add-MpPreference -ExclusionPath $localsysmonconfig
-Add-MpPreference -ExclusionPath $sysmonshareconfig
-#if file has been removed copy it back down.
-if($(test-path $localsysmonconfig) -eq $false){copy-item $sysmonshareconfig $localsysmonconfig}
-
-Function main{
-
-# Verify exe and config are accessible in sysmon share location
-$checkshareexe = Test-Path "$sysmonshareexe"
-$checkshareconf = Test-Path "$sysmonshareconfig"
-
-if(($checkshareexe -eq $true) -and ($checkshareconf -eq $true))
-{
-
-    # Checks for existing sysmon.exe in C:\windows\
-    $checklocalexe = Test-Path $localsysmonexe
-    
-    # Checks for existance of Sysmon service
-    $checkservice = get-service -Name $service -ErrorAction SilentlyContinue
-
-    # If the binary exists but the service doesn't, log the event and move to installation
-    if (-Not $checkservice)
-    {
-        $exectime = Get-Date
-        Add-Content $sysmonlog "$exectime ---- $hostname ---- No Sysmon service but binary exists"
+function Invoke-Prep{
+    # Check that the log file exists
+    if (!(Test-Path $sysmonlog)){
+        # Create a new log file if one doesn't exist
+        Set-Content $sysmonlog "" -NoNewline
     }
 
-    if (($checklocalexe -eq $true) -and ($checkservice)) {
+    #Add exclusion for sysmonconfig in Windows Defender.
+    Add-MpPreference -ExclusionPath $localsysmonconfig
+    Add-MpPreference -ExclusionPath $sysmonshareconfig
+}
 
-        # Get Sysmon versions from share and local
-        $sysmonsharever=[System.Diagnostics.FileVersionInfo]::GetVersionInfo($sysmonshareexe).FileVersion
-        $localsysmonver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo($localsysmonexe).FileVersion
+function Get-SysmonUpdates{
+    # Get Sysmon versions from share and local
+    $sysmonsharever=[System.Diagnostics.FileVersionInfo]::GetVersionInfo($sysmonshareexe).FileVersion
+    $localsysmonver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo($localsysmonexe).FileVersion
 
-        # Convert strings to integers for comparison
-        [double]$availablesysmonversion = [convert]::ToDouble($sysmonsharever)
-        [double]$installedsysmonversion = [convert]::ToDouble($localsysmonver)
+    # Convert strings to integers for comparison
+    [double]$availablesysmonversion = [convert]::ToDouble($sysmonsharever)
+    [double]$installedsysmonversion = [convert]::ToDouble($localsysmonver)
 
-        # Checks if share version is greater than the installed version
-        if($availablesysmonversion -gt $installedsysmonversion)
-        {
-            # Copy sysmon locally, for install performance and incase network drops during install
-            cp $sysmonshareconfig $localsysmonconfig
-            cmd /c "$localsysmonexe -u"
-            cmd /c "$sysmonshareexe -accepteula -i $sysmonshareconfig"
-            # Make sure copies where successful
-            if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig))
-            {
-                $exectime = Get-Date
-                Add-Content $sysmonlog "$exectime ---- $hostname ---- Updated Sysmon driver."
-            }
-
-            else {
-                $exectime = Get-Date
-                Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed updating while copying Sysmon files or starting driver."
-                exit
-            }
-        }
-        # Obtain sysmonconfig.xml from share last write time
-        $sysmonsharets = (get-item $sysmonshareconfig).LastWriteTime
-
-        # Obtain sysmonconfig.xml from local last write time
-        $localsysmonts = (get-item $localsysmonconfig).LastWriteTime
-
-        # If the lastwrite for the share config is greater than the lastwrite for local - update config
-        if($sysmonsharets -gt $localsysmonts)
-        {
-            # Copy config locally, for install performance and incase network drops during install
-            cmd /c "copy $sysmonshareconfig $localsysmonconfig"
-            # Make sure network copy was successful
-            if(Test-Path $localsysmonconfig)
-            {
-                cmd /c "$localsysmonexe -c $localsysmonconfig"
-                $exectime = Get-Date
-                Add-Content $sysmonlog "$exectime ---- $hostname ---- Updated Sysmon configuration."
-            }
-            else {
-                $exectime = Get-Date
-                Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed to copy new Sysmon config or failed to start driver."
-                exit
-            }                     
-        }
-    }
-    # Sysmon isn't installed, install it from the share location
-    else
-    {
-        # Running install from share has much better success rate than installing locally
-        cmd /c "$sysmonshareexe -accepteula -i $sysmonshareconfig"
-        $exectime = Get-Date
-        Add-Content $sysmonlog "$exectime ---- $hostname ---- Sysmon driver installed."
+    # Checks if share version is greater than the installed version
+    if($availablesysmonversion -gt $installedsysmonversion){
+        # Copy sysmon locally, for install performance and incase network drops during install
+        Copy-Item $sysmonshareconfig $localsysmonconfig
+        Invoke-Logging("Uninstalling the installed Sysmon version.")
+        cmd /c "$localsysmonexe -u" | Out-Null
+        Invoke-Logging("Installing a new Sysmon version.")
+        cmd /c "$sysmonshareexe -accepteula -i $sysmonshareconfig" | Out-Null
         # Make sure copies where successful
-        if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig))
-        {
-            $exectime = Get-Date
-            Add-Content $sysmonlog "$exectime ---- $hostname ---- Sysmon files exist"
+        if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig)){
+            Invoke-Logging("Updated Sysmon driver.")
         }
         else {
-            $exectime = Get-Date
-            Add-Content $sysmonlog "$exectime ---- $hostname ---- Something went wrong"
+            Invoke-Logging("Failed to update Sysmon files.")
             exit
         }
-    }    
-}
-else{
-    $exectime = Get-Date
-    Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed to find Sysmon files in $sysmonshare."
-}
-# Ensure sysmon services are running
-try{
-    $sysmonservice = get-service -Name $service -ErrorAction STOP
-    $exectime = Get-Date
-    if($sysmonservice.Status -ne "running"){Add-Content $LogFileForScript "$exectime ---- $hostname ---- Service was stopped, attempting start of Sysmon."; start-service -name $service -ErrorAction Stop}
-}
-catch{
-    $exectime = Get-Date
-    Add-Content $sysmonlog "$exectime ---- $hostname ---- Failed restarting and or getting status of Sysmon"
-    exit
+    }
 }
 
+function Get-ConfigUpdates{
+    # Obtain sysmonconfig.xml from share last write time
+    $sysmonsharets = (Get-Item $sysmonshareconfig).LastWriteTime
+
+    # Obtain sysmonconfig.xml from local last write time
+    $localsysmonts = (Get-Item $localsysmonconfig).LastWriteTime
+
+    # If the lastwrite for the share config is greater than the lastwrite for local - update config
+    if($sysmonsharets -gt $localsysmonts)
+    {
+        # Copy config locally, for install performance and incase network drops during install
+        Copy-Item $sysmonshareconfig $localsysmonconfig
+        # Make sure network copy was successful
+        if(Test-Path $localsysmonconfig)
+        {
+            cmd /c "$localsysmonexe -c $localsysmonconfig"
+            Invoke-Logging("Updated Sysmon configuration.")
+        }
+        else {
+            Invoke-Logging("Failed to copy new Sysmon config or failed to start driver.")
+            exit
+        }                     
+    }
 }
 
-function Sysmon_Archive_Cleanup
-{
-#Manages the archive used to store files seen in EID 23 logs. This will keep the last 30 days worth of files should they be needed for forensics.
-$Path = "C:\Sysmon"
-$Days = "-30"
- 
-$CurrentDate = Get-Date
-$DatetoDelete = $CurrentDate.AddDays($Daysback)
-Get-ChildItem $Path | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item
+function Get-Updates{
+    # No need to check for Sysmon executables, as this is checked in Invoke-ShareFetch.
+    Invoke-Logging("Checking for updates.")
+    Get-SysmonUpdates
+    if ((Get-Item $sysmonshareconfig) -and (Get-Item $localsysmonconfig)) {
+        Get-ConfigUpdates
+    }
 }
 
-main
-Sysmon_Archive_Cleanup
+function Invoke-ShareFetch{
+    # Verify exe and config are accessible in sysmon share location
+    if(Test-Path $sysmonshare){
+        if((Test-Path "$sysmonshareexe") -and (Test-Path "$sysmonshareconfig")){
+            # If local config has been removed, copy it back down.
+            if(!(Test-Path $localsysmonconfig)){
+                Copy-Item $sysmonshareconfig $localsysmonconfig
+                Invoke-Logging("Local Config not found at $localsysmonconfig. Copying to local system.")
+            }
+    
+            # Check for Sysmon.exe on the local host
+            if(Test-Path $localsysmonexe){
+                # If the binary exists but the service doesn't, log the event and move to installation
+                try{
+                    $sysmonstatus = Get-Service -Name $service -ErrorAction SilentlyContinue 
+                    if($sysmonstatus){
+                        Invoke-Logging("The Sysmon service is installed.")
+                        Get-Updates
+                    }
+                    else{
+                        Invoke-Logging("The Sysmon Service is not running, but the binary exists.")
+                        Invoke-SysmonInstallation
+                    }
+                }
+                # If the binary and service are running, check for updates
+                catch{
+                    Invoke-Logging("The Sysmon service is not running, but the binary exists.")
+                    Invoke-SysmonInstallation
+                }
+            }
+            # Sysmon doesn't exist locally
+            else{
+                Invoke-SysmonInstallation
+            }
+        }
+        # If one of the share files is not reachable, log and exit
+        else{
+            if (!(Test-Path $sysmonshareexe)){
+                Invoke-Logging("Cannot find a file at $sysmonshareexe")
+            }
+            if (!(Test-Path $sysmonshareconfig)){
+                Invoke-Logging("Cannot find a file at $sysmonshareconfig")
+            }
+            exit
+        }
+    }
+    # If the Sysmon share cannot be reached, log and exit.
+    else{
+        Invoke-Logging("Could not connect to $sysmonshare")
+        exit
+    }
+}
+
+function Invoke-SysmonInstallation{
+    # Sysmon isn't installed, install it from the share location
+    cmd /c "$sysmonshareexe -accepteula -i $sysmonshareconfig" | Out-Null
+    Invoke-Logging("Sysmon driver installed.")
+    # Make sure copies where successful
+    if((Test-Path $localsysmonexe) -and (Test-Path $localsysmonconfig)){
+        Invoke-Logging("Files found: $localsysmonexe and $localsysmonconfig")
+    }
+    else {
+        if(!(Test-Path $localsysmonexe)){
+            Invoke-Logging("Something went wrong and could not find $localsysmonexe after installation.")
+        }
+        if(!(Test-Path $localsysmonconfig)){
+            Invoke-Logging("Something went wrong and could not find $localsysmonconfig after installation.")
+        }
+        exit
+    }
+}
+
+function Get-SysmonStatus{
+    # Ensure sysmon services are running
+    try{
+        $sysmonstatus = Get-Service -Name $service -ErrorAction SilentlyContinue
+        if($sysmonstatus){
+            try{
+                Start-Service -name $service -ErrorAction SilentlyContinue
+            }
+            catch{
+                Invoke-Logging("Failed restarting and or getting the status of Sysmon.")
+                exit
+            }
+        }
+    }
+    catch{
+        Invoke-Logging("Service was stopped, attempting to start Sysmon.")
+        try{
+            Start-Service -name $service -ErrorAction SilentlyContinue
+        }
+        catch{
+            Invoke-Logging("Failed restarting or getting the status of Sysmon.")
+            exit
+        }
+    }
+}
+
+function Invoke-ArchiveCleanup{
+    if((Test-Path $archivepath) -and ($Env:USERNAME -match '\$$')){
+        #Manages the archive used to store files seen in EID 23 logs.   
+        $CurrentDate = Get-Date
+        $DatetoDelete = $CurrentDate.AddDays($(0 - $archivedays))
+        if($(Get-ChildItem $archivepath | Where-Object { $_.LastWriteTime -lt $DatetoDelete })){
+            Get-ChildItem $archivepath | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item
+            Invoke-Logging("Archive Cleaned")
+        }
+    }
+}
+
+function Invoke-LogCleanup{
+    if((Get-Content $sysmonlog).Length -gt 1000){
+        $logcontent = Get-Content $sysmonlog -Tail 500
+        Set-Content -Path $sysmonlog -Value $logcontent
+        Invoke-Logging("Logs Cleaned")
+    }
+}
+
+function Invoke-Main{
+    Invoke-Prep
+    Invoke-ShareFetch
+    Get-SysmonStatus
+    Invoke-ArchiveCleanup
+    Invoke-LogCleanup
+}
+
+Invoke-Main
