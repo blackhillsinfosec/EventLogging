@@ -1,5 +1,5 @@
 <Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
-  <SubscriptionId>WEC1_AD_auth_Events</SubscriptionId>
+  <SubscriptionId>WEC1_AD_auth_v1</SubscriptionId>
   <SubscriptionType>SourceInitiated</SubscriptionType>
   <Description>Events related to Active Directory Federation Services.</Description>
   <Enabled>true</Enabled>
