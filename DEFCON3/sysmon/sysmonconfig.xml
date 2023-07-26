@@ -1,4 +1,4 @@
-﻿<Sysmon schemaversion="4.60">
+﻿<Sysmon schemaversion="4.90">
   <HashAlgorithms>*</HashAlgorithms>
   <!-- This now also determines the file names of the files preserved (String) -->
   <CheckRevocation>False</CheckRevocation>
@@ -452,6 +452,8 @@
           <ParentImage condition="is">"C:\Program Files\Microsoft Monitoring Agent\Agent\MonitoringHost.exe"</ParentImage>
           <CommandLine condition="is">C:\Windows\system32\cscript.exe" /nologo "MonitorKnowledgeDiscovery.vbs</CommandLine>
         </Rule>
+        <Image condition="begin with">C:\Program Files\Bitdefender\</Image>
+        <Image condition="begin with">C:\ProgramData\Bitdefender/</Image>
         <ParentImage condition="end with">C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\vpnagent.exe</ParentImage>
         <CommandLine condition="begin with">C:\Windows\Microsoft.NET\Framework\v4.0.30319\ngen.exe</CommandLine>
         <Image condition="is">C:\Windows\Microsoft.NET\Framework64\v4.0.30319\mscorsvw.exe</Image>
@@ -474,6 +476,7 @@
         <CommandLine condition="begin with">"C:\Program Files\Google\Chrome\Application\chrome.exe" --type=</CommandLine>
         <Image condition="begin with">C:\Program Files (x86)\Google\Update\</Image>
         <ParentImage condition="begin with">C:\Program Files (x86)\Google\Update\</ParentImage>
+        <Image condition="begin with">C:\Program Files\HP\Security Update Service\</Image>
         <ParentImage condition="is">C:\Program Files (x86)\RES Software\Workspace Manager\pfwsmgr.exe</ParentImage>
         <ParentImage condition="is">C:\Program Files (x86)\RES Software\Workspace Manager\respesvc64.exe</ParentImage>
         <ParentImage condition="is">C:\Program Files (x86)\Ivanti\Workspace Control\pfwsmgr.exe</ParentImage>
@@ -491,6 +494,10 @@
         <CommandLine condition="begin with">"C:\Program Files\Mozilla Firefox\plugin-container.exe" --channel</CommandLine>
         <CommandLine condition="begin with">"C:\Program Files (x86)\Mozilla Firefox\plugin-container.exe" --channel</CommandLine>
         <Image condition="contains all"> C:\Users\;\AppData\Local\Microsoft\OneDrive;\FileCoAuth.exe</Image>
+        <Image condition="begin with">C:\Program Files (x86)\Panda Security\</Image>
+        <Image condition="begin with">C:\Program Files\Panda Security\</Image>
+        <Image condition="begin with">C:\ProgramData\Panda Security\</Image>
+        <Image condition="begin with">C:\Users\*\AppData\Local\Temp\*.tmp\Files\program files\Panda Security\</Image>
         <Image condition="is">C:\Program Files (x86)\Sophos\Sophos Anti-Virus\Web Intelligence\swi_service.exe</Image>
         <Image condition="is">C:\Program Files (x86)\Sophos\Sophos Anti-Virus\Web Control\swc_service.exe</Image>
         <Image condition="is">C:\Program Files (x86)\Sophos\Sophos System Protection\ssp.exe</Image>
@@ -1213,6 +1220,10 @@
         <SourceImage condition="is">C:\Windows\System32\lsm.exe</SourceImage>
         <SourceImage condition="end with">Microsoft.Identity.AadConnect.Health.AadSync.Host.exe</SourceImage>
         <SourceImage condition="begin with">C:\Program Files (x86)\Symantec\Symantec Endpoint Protection</SourceImage>
+		<SourceImage condition="begin with">C:\Program Files (x86)\Panda Security\</SourceImage>
+        <SourceImage condition="begin with">C:\Program Files\Panda Security\</SourceImage>
+        <SourceImage condition="begin with">C:\ProgramData\Panda Security\</SourceImage>
+        <SourceImage condition="begin with">C:\Users\*\AppData\Local\Temp\*.tmp\Files\program files\Panda Security\</SourceImage>
         <GrantedAccess>0x1000</GrantedAccess>
         <GrantedAccess>0x1400</GrantedAccess>
         <GrantedAccess>0x101400</GrantedAccess>
@@ -2413,6 +2424,9 @@
         <SourceImage name="technique_id=T1055,technique_name=Process Injection" condition="begin with">C:\</SourceImage>
         <SourceImage name="technique_id=T1055,technique_name=Process Injection" condition="begin with">\\</SourceImage>
       </CreateRemoteThread>
+    </RuleGroup>
+    <RuleGroup groupRelation="or">
+        <FileExecutableDetected onmatch="exclude"></FileExecutableDetected>
     </RuleGroup>
   </EventFiltering>
 </Sysmon>
