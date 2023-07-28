@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
+	<SubscriptionId>WEC5_DefenderFW_app_events_v2.1</SubscriptionId>
+	<SubscriptionType>SourceInitiated</SubscriptionType>
+	<Description>Application crashes, hangs and error reporting logs.</Description>
+	<Enabled>true</Enabled>
+	<Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+	<ConfigurationMode>Custom</ConfigurationMode>
+	<Delivery Mode="Push">
+		<Batching>
+			<MaxItems>1000</MaxItems>
+			<MaxLatencyTime>300000</MaxLatencyTime>
+		</Batching>
+		<PushSettings>
+			<Heartbeat Interval="14400000"/>
+		</PushSettings>
+	</Delivery>
+	<Query>
+		<![CDATA[
+<QueryList><Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational"><Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1123 or EventID=1124 or EventID=5007)]]</Select><Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1123 or EventID=1124 or EventID=5007)]]</Select></Query><Query Id="1" Path="Microsoft-Windows-Security-Mitigations/KernelMode"><Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">*</Select></Query><Query Id="2" Path="Microsoft-Windows-Security-Mitigations/UserMode"><Select Path="Microsoft-Windows-Security-Mitigations/UserMode">*</Select></Query><Query Id="3" Path="Microsoft-Windows-Win32k/Operational"><Select Path="Microsoft-Windows-Win32k/Operational">*[System[(EventID=260)]]</Select></Query><Query Id="4" Path="Microsoft-Windows-Windows Defender/Operational"><Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1125 or EventID=1126)]]</Select><Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1125 or EventID=1126)]]</Select></Query><Query Id="5" Path="Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"><Select Path="Microsoft-Windows-Windows Firewall With Advanced Security/Firewall">*[System[Provider[@Name='Microsoft-Windows-Windows Firewall With Advanced Security'] and (Level=2 or Level=4 or Level=0) and (EventID=2004 or EventID=2009)]]</Select></Query><Query Id="6" Path="Security"><Select Path="Security">*[System[(EventID &gt;=4944 and EventID &lt;=4954)]]</Select><Select Path="Security">*[System[(EventID &gt;=4956 and EventID &lt;=4958)]]</Select></Query><Query Id="7" Path="Security"><Select Path="Security">*[System[(EventID=5024 or EventID=5025 or EventID=5037)]]</Select><Select Path="Security">*[System[(EventID &gt;=5027 and EventID &lt;=5030)]]</Select><Select Path="Security">*[System[(EventID &gt;=5032 and EventID &lt;=5035)]]</Select></Query></QueryList>
+		]]>
+	</Query>
+	<ReadExistingEvents>true</ReadExistingEvents>
+	<TransportName>HTTP</TransportName>
+	<ContentFormat>RenderedText</ContentFormat>
+	<Locale Language="en-US"/>
+	<LogFile>ForwardedEvents</LogFile>
+	<PublisherName>Microsoft-Windows-EventCollector</PublisherName>
+	<AllowedSourceNonDomainComputers></AllowedSourceNonDomainComputers>
+	<AllowedSourceDomainComputers>O:NSG:NSD:(A;;GA;;;DC)(A;;GA;;;NS)(A;;GA;;;DD)</AllowedSourceDomainComputers>
+</Subscription>

@@ -1,0 +1,31 @@
+﻿﻿<?xml version="1.0" encoding="UTF-8"?>
+<Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
+	<SubscriptionId>WEC1_AD_auth_Events_v2.1</SubscriptionId>
+	<SubscriptionType>SourceInitiated</SubscriptionType>
+	<Description>Events related to Active Directory Federation Services.</Description>
+	<Enabled>true</Enabled>
+	<Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+	<ConfigurationMode>Custom</ConfigurationMode>
+	<Delivery Mode="Push">
+		<Batching>
+			<MaxItems>1000</MaxItems>
+			<MaxLatencyTime>300000</MaxLatencyTime>
+		</Batching>
+		<PushSettings>
+			<Heartbeat Interval="14400000"/>
+		</PushSettings>
+	</Delivery>
+	<Query>
+		<![CDATA[
+<QueryList><Query Id="0" Path="Security"><Select Path="Security">*[System[Provider[@Name='AD FS Auditing']]]</Select></Query><Query Id="1" Path="AD FS/Admin"><Select Path="AD FS/Admin">*[System[Provider[@Name='AD FS']]]</Select></Query><Query Id="2" Path="AD FS Tracing/Debug"><Select Path="AD FS Tracing/Debug">*</Select></Query><Query Id="3" Path="Duo Authentication for AD FS"><Select Path="Duo Authentication for AD FS">*</Select></Query><Query Id="4" Path="Security"><Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and EventID=4740]]</Select></Query><Query Id="5" Path="Security"><Select Path="Security">*[System[(EventID=4627)]]</Select><Select Path="Security">*[System[(EventID=4703 or EventID=4704 or EventID=4705)]]</Select><Select Path="Security">*[System[(EventID=4720)]]</Select><Select Path="Security">*[System[(EventID &gt;=4722 and EventID &lt;=4735)]]</Select><Select Path="Security">*[System[(EventID &gt;=4737 and EventID &lt;=4739)]]</Select><Select Path="Security">*[System[(EventID &gt;=4741 and EventID &lt;=4767)]]</Select><Select Path="Security">*[System[(EventID &gt;=4780 and EventID &lt;=4782)]]</Select><Select Path="Security">*[System[(EventID=4793 or EventID=4794)]]</Select><Select Path="Security">*[System[(EventID=4798 or EventID=4799)]]</Select><Select Path="Security">*[System[(EventID=5376 or EventID=5377)]]</Select></Query><Query Id="6" Path="Security"><Select Path="Security">*[System[(EventID=4662)]] and *[System[Task='14080']]</Select></Query><Query Id="7" Path="Security"><Select Path="Security">*[System[(EventID=5136 or EventID=5137 or EventID=5178 or EventID=5139 or EventID=5141)]]</Select></Query><Query Id="8" Path="Security"><Select Path="Security">*[System[(EventID=4713)]]</Select></Query><Query Id="9" Path="Security"><Select Path="Security">*[System[(EventID=4706 or EventID=4707 or EventID=4716 or EventID=4717 or EventID=4718 or EventID=4739 or EventID=4864 or EventID=4865 or EventID=4866 or EventID=4867)]]</Select></Query><Query Id="10" Path="Security"><Select Path="Security">*[System[(EventID &gt;=4624 and EventID &lt;=4626)]]</Select><Select Path="Security">*[System[(EventID=4634 or EventID=4647 or EventID=4649 or EventID=4672 or EventID=4675)]]</Select><Select Path="Security">*[System[(EventID &gt;=4774 and EventID &lt;=4779)]]</Select><Select Path="Security">*[System[(EventID &gt;=4800 and EventID &lt;=4803)]]</Select><Select Path="Security">*[System[(EventID=4964)]]</Select><Select Path="Security">*[System[(EventID=5378)]]</Select><Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress></Query><Query Id="11" Path="Application"><Select Path="Application">*[System[Provider[@Name='Duo Security']]]</Select></Query><Query Id="12" Path="Security"><Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and EventID=4648]] and *[EventData[Data[@Name='ProcessName']!='C:\Windows\System32\taskhost.exe']]</Select></Query><Query Id="13" Path="System"><Select Path="System">*[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and Level=2 and (EventID=1085 or EventID=1125 or EventID=1127)]]</Select></Query><Query Id="14" Path="Security"><Select Path="Security">*[System[(EventID=6144 or EventID=6145)]]</Select></Query><Query Id="15" Path="Security"><Select Path="Security">*[System[(EventID=4768 or EventID=4769 or EventID=4770 or EventID=4771 or EventID=4772 or EventID=4773)]]</Select></Query><Query Id="16" Path="Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController"><Select Path="Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select><Select Path="Microsoft-Windows-Authentication/ProtectedUserFailures-DomainController">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select><Select Path="Microsoft-Windows-NTLM/Operational">*[System[Provider[@Name='Microsoft-Windows-NTLM']]]</Select></Query><Query Id="17" Path="Security"><Select Path="Security">*[System[(EventID=5140 or EventID=5142 or EventID=5144 or EventID=5145 or EventID=5168)]]</Select></Query><Query Id="18" Path="Microsoft-Windows-SMBClient/Operational"><Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(EventID=30622 or EventID=30624)]]</Select></Query><Query Id="19" Path="Microsoft-Windows-SMBClient/Security"><Select Path="Microsoft-Windows-SMBClient/Security">*</Select></Query><Query Id="20" Path="Microsoft-Windows-SMBServer/Security"><Select Path="Microsoft-Windows-SMBServer/Security">*</Select></Query><Query Id="21" Path="Microsoft-Windows-SmartCard-Audit/Authentication"><Select Path="Microsoft-Windows-SmartCard-Audit/Authentication">*</Select></Query><Query Id="22" Path="Microsoft-Windows-WMI-Activity/Operational"><Select Path="Microsoft-Windows-WMI-Activity/Operational">*</Select></Query><Query Id="23" Path="Microsoft-Windows-TPM-WMI"><Select Path="Microsoft-Windows-TPM-WMI">*</Select></Query></QueryList>
+		]]>
+	</Query>
+	<ReadExistingEvents>true</ReadExistingEvents>
+	<TransportName>HTTP</TransportName>
+	<ContentFormat>RenderedText</ContentFormat>
+	<Locale Language="en-US"/>
+	<LogFile>ForwardedEvents</LogFile>
+	<PublisherName>Microsoft-Windows-EventCollector</PublisherName>
+	<AllowedSourceNonDomainComputers></AllowedSourceNonDomainComputers>
+	<AllowedSourceDomainComputers>O:NSG:NSD:(A;;GA;;;DC)(A;;GA;;;NS)(A;;GA;;;DD)</AllowedSourceDomainComputers>
+</Subscription>
