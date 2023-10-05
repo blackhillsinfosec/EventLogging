@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
+	<SubscriptionId>WEC7_sec_evt_v1</SubscriptionId>
+	<SubscriptionType>SourceInitiated</SubscriptionType>
+	<Description></Description>
+	<Enabled>true</Enabled>
+	<Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+	<ConfigurationMode>Normal</ConfigurationMode>
+	<Delivery Mode="Push">
+		<Batching>
+			<MaxLatencyTime>900000</MaxLatencyTime>
+		</Batching>
+		<PushSettings>
+			<Heartbeat Interval="900000"/>
+		</PushSettings>
+	</Delivery>
+	<Query>
+		<![CDATA[
+<QueryList><Query Id="0" Path="Security"><Select Path="Security">*[System[(EventID=4768 or EventID=4769 or EventID=4770 or EventID=4771 or EventID=4772 or EventID=4773)]]</Select></Query><Query Id="1" Path="Security"><Select Path="Security">*[System[(EventID=4673 or EventID=4674 or EventID=4985)]]</Select></Query><Query Id="2" Path="Security"><Select Path="Security">*[System[(EventID=5140 or EventID=5142 or EventID=5144 or EventID=5145 or EventID=5168)]]</Select></Query><Query Id="3" Path="Security"><Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=0 or Level=4) and (EventID=5038 or EventID=6281 or EventID=6410)]]</Select></Query><Query Id="4" Path="Security"><Select Path="Security">*[System[(EventID=1100 or EventID=1104 or EventID=1105 or EventID=1108)]]</Select></Query><Query Id="5" Path="Security"><Select Path="Security">*[System[(EventID=4886 or EventID=4887 or EventID=4888)]]</Select></Query><Query Id="6" Path="Security"><Select Path="Security">*[System[(EventID=1100 or EventID=1104 or EventID=1105 or EventID=1108)]]</Select></Query><Query Id="7" Path="Security"><Select Path="Security">*[System[(EventID=6416)]]</Select><Select Path="Security">*[System[(EventID &gt;=6419 and EventID &lt;=6424)]]</Select></Query><Query Id="8" Path="Security"><Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Eventlog'] and Level=4 and EventID=1102]]</Select></Query><Query Id="9" Path="Security"><Select Path="Security">*[System[(EventID=5024 or EventID=5025 or EventID=5037)]]</Select><Select Path="Security">*[System[(EventID &gt;=5027 and EventID &lt;=5030)]]</Select><Select Path="Security">*[System[(EventID &gt;=5032 and EventID &lt;=5035)]]</Select></Query></QueryList>
+		]]>
+	</Query>
+	<ReadExistingEvents>true</ReadExistingEvents>
+	<TransportName>HTTP</TransportName>
+	<ContentFormat>RenderedText</ContentFormat>
+	<Locale Language="en-US"/>
+	<LogFile>ForwardedEvents</LogFile>
+	<PublisherName>Microsoft-Windows-EventCollector</PublisherName>
+	<AllowedSourceNonDomainComputers></AllowedSourceNonDomainComputers>
+	<AllowedSourceDomainComputers>O:NSG:BAD:P(A;;GA;;;DC)S:</AllowedSourceDomainComputers>
+</Subscription>
