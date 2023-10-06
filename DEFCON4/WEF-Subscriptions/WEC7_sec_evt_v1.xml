@@ -5,7 +5,7 @@
 	<Description></Description>
 	<Enabled>true</Enabled>
 	<Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
-	<ConfigurationMode>Normal</ConfigurationMode>
+	<ConfigurationMode>Custom</ConfigurationMode>
 	<Delivery Mode="Push">
 		<Batching>
 			<MaxLatencyTime>900000</MaxLatencyTime>
