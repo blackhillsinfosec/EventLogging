@@ -1,4 +1,10 @@
+# Notice
+This repo is no longer maintined as of April 2024
+
 ![BHIS](https://www.blackhillsinfosec.com/wp-content/uploads/2018/12/BHIS-logo-L-1024x1024-400x400.png)
+
+# Notice
+This repo is no longer maintined as of April 2024
 
 # EventLogging
 This repo contains guidance on setting up event logging. This guidance is broken up into sections, Defensive Readiness Condition (DEFCON), and intended to be applied from 5 (lowest) to 1 (highest).
@@ -76,3 +82,6 @@ Once the files have been edited you can run the scripts on the respective host. 
 GNUv3 - [License][1]
 
   [1]: LICENSE
+
+# Notice
+This repo is no longer maintined as of April 2024
