@@ -1,3 +1,6 @@
+# Notice
+This repo is no longer maintined as of April 2024
+
 # DEFCON4
 DEFCON4 contains guidance for Increased Security Measures. This guidance is intended to setup foundational logging principals which will be built upon in DEFCON3
 
